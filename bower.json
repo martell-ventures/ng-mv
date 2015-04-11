@@ -1,0 +1,23 @@
+{
+  "name": "ng-mv",
+  "version": "0.0.1",
+  "description": "Martell Ventures Angular Components",
+  "keywords": [
+    "Martell",
+    "Ventures",
+    "LLC"
+  ],
+  "authors": [
+    "Ryan Martell",
+    "Ryan Steadman"
+  ],
+  "license": "n",
+	"private": true,
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"test",
+		"tests"
+	]
+}
