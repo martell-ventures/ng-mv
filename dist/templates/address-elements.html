@@ -1,0 +1,29 @@
+<div class="form-group">
+	<label>Country</label>
+	<select class="form-control" ng-model="countryObject" ng-options="c.Name for c in countries"></select>
+</div>
+<div class="form-group">
+	<label>Street</label>
+	<input class="form-control" type="text" ng-model="street" placeholder="1010 Main Street" ng-required="requiredFields['street']"></input>
+</div>
+<div class="form-group" ng-show='useStreet2'>
+	<label>Street Line 2</label>
+	<input class="form-control" type="text" ng-model="street2" placeholder="Apt #12" ng-required="requiredFields['street2']"></input>
+	<p class="help-block">
+	</p>
+</div>
+<div class="form-group">
+	<label>City</label>
+	<input class="form-control" type="text" ng-model="city" placeholder="City" ng-required="requiredFields['city']"></input>
+	<p class="help-block">
+	</p>
+</div>
+<div class="form-group">
+	<label>{{ countryObject.StateLabel || 'State/Province/Region' }}</label>
+	<select ng-show="countryObject.States" class="form-control" ng-model="state" ng-options="s.Abbreviation as s.Name for s in countryObject.States" ng-required="requiredFields['state']"></select>
+	<input ng-hide="countryObject.States" class="form-control" type="text" ng-model="state" ng-required="requiredFields['state']"></input>
+</div>
+<div class="form-group" ng-show="country=='US'">
+	<label>{{ countryObject.PostalLabel || 'Postal Code' }}</label>
+	<input class="form-control" type="text" ng-model="zip" placeholder="Zip" ng-required="requiredFields['zip']"></input>
+</div>
