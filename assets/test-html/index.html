@@ -1,0 +1,76 @@
+<html>
+<head>
+	<title>MV Test Harness</title>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/angular.js"></script>
+	<script type="text/javascript" src="js/ui-bootstrap-tpls.min.js"></script>
+	<script type="text/javascript" src="js/mv.js"></script>
+
+	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+</head>
+<body>
+	<div class="container">
+		<div class="col-md-6">
+			<h3>Credit Card Form</h3>
+			<div class="well">
+				<form name="cardForm" ng-init="card= { save: false }" novalidation>
+					<credit-card-information 
+						cardholder-name="card.name" 
+						card-number="card.number" 
+						card-type="card.type"
+						expiration-month="card.expirationMonth" 
+						expiration-year="card.expirationYear" 
+						security-code="card.cvv",
+						card-required="card.required"
+						save-card="card.save">
+					</credit-card-information>
+					<a class="btn btn-primary" ng-disabled="cardForm.$invalid">Submit</a>
+					<div class="checkbox">
+						<label><input type="checkbox" ng-model="card.showJSON"></input> Show JSON</label>
+					</div>
+					<pre ng-show="card.showJSON">{{ card | json }}</pre>
+				</form>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<h3>Address Form</h3>
+			<div class="well">
+				<form name="addressForm" ng-init="address= { useStreet2: true }" novalidation>
+					<div class="checkbox">
+						<label><input type="checkbox" ng-model="address.useStreet2"></input> Show Street 2</label>
+					</div>
+				
+					<mv-address
+						street="address.street"
+						street2="address.street2"
+						city="address.city"
+						state="address.state"
+						zip="address.zip"
+						country="address.country"
+						required-fields="{ street: true, city: true, state: true, zip: true, country: true }"
+						use-street-2="address.useStreet2">
+					</mv-address>
+					<a class="btn btn-primary" ng-disabled="addressForm.$invalid">Submit</a>
+					<div class="checkbox">
+						<label><input type="checkbox" ng-model="address.showJSON"></input> Show JSON</label>
+					</div>
+					<pre ng-show="address.showJSON">{{ address | json }}</pre>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script>
+	var app= angular.module('myApp', ['mv.configuration', 'mv.billing', 'mv.filters', 'mv.forms', 'mv.upload.button', 'mv.utils', 'mv.widgets']);
+
+    // configure the martell ventures stuff.
+    app.config(["$mvConfigurationProvider", function(mvConfig) {
+      mvConfig.setTemplateBasePath('/templates/');
+    }]);
+	
+	angular.element(document).ready(function() {
+		angular.bootstrap(document, ['myApp']);
+	});
+</script>
+</html>

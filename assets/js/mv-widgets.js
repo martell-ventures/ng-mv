@@ -19,8 +19,12 @@
         {
           formGroupParent.addClass('has-feedback');
         }
-        var icon= angular.element('<span class=" form-control-feedback glyphicon glyphicon-ok hidden"></span>');
-        $element.after(icon);
+        var icon;
+        if($element.prop('tagName')=='INPUT')
+        {
+          icon= angular.element('<span class=" form-control-feedback glyphicon glyphicon-ok hidden"></span>');
+          $element.after(icon);
+        }
 
         function updateValidity(show, valid) {
           if(show)
@@ -28,14 +32,23 @@
             if(valid)
             {
               formGroupParent.removeClass('has-error').addClass('has-success');
-              icon.removeClass('hidden').removeClass('glyphicon-remove').addClass('glyphicon-ok');
+              if(icon !== undefined)
+              {
+                icon.removeClass('hidden').removeClass('glyphicon-remove').addClass('glyphicon-ok');
+              }
             } else{
               formGroupParent.removeClass('has-success').addClass('has-error');
-              icon.removeClass('hidden').removeClass('glyphicon-ok').addClass('glyphicon-remove');
+              if(icon !== undefined)
+              {
+                icon.removeClass('hidden').removeClass('glyphicon-ok').addClass('glyphicon-remove');
+              }
             }
           } else {
             formGroupParent.removeClass('has-success').removeClass('has-error');
-            icon.addClass('hidden');
+            if(icon !== undefined)
+            {
+              icon.addClass('hidden');
+            }
           }
         }
 

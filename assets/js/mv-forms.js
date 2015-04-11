@@ -20,7 +20,6 @@
 
 				return result;
 			},
-			transclude: true,
 			scope: {
 				street: "=",
 				street2: "=?", //optional, also set useStreet2 to true

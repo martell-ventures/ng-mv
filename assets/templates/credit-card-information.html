@@ -1,0 +1,45 @@
+	<div class="form-group">
+		<label>Cardholder Name</label>
+		<input type="text" class="form-control" show-validation-icon ng-model="cardholderName" min-length="3" required></input>
+	</div>
+	<div class="form-group">
+		<label>Card Number</label>
+		<input type="text" class="form-control" credit-card-number card-type="cardType" ng-model-options="{ allowInvalid: true }" 
+		ng-model="cardNumber" ng-trim="false" show-validation-icon required></input>
+	</div>
+	<div class="row">
+		<div class="col-md-5 col-sm-4 col-xs-6">
+			<div class="form-group">
+				<label>Expire</label>
+				<select class="form-control" credit-card-expiration-month expiration-year="expirationYear" ng-model="expirationMonth" ng-model-options="{ allowInvalid: true }"  ng-options="month.value as month.label for month in state.months" show-validation-icon  required>
+				</select>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-4 col-xs-6">
+			<div class="form-group">
+				<label>&nbsp;</label>
+				<select class="form-control" credit-card-expiration-year ng-model="expirationYear" 
+					ng-model-options="{ allowInvalid: true }" show-validation-icon  ng-options="year.value as year.label for year in state.years" required>
+				</select>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="form-group">
+				<label>CVV</label>
+				<input type="text" class="form-control" credit-card-cvv="cardNumber" ng-model="securityCode" ng-minlength="card.cvvMinLength" ng-maxlength="card.cvvMaxLength" maxLength="{{ card.cvvMaxLength }}" show-validation-icon required></input>
+			</div>
+		</div>
+	</div>
+	<div class="form-group" ng-show="state.allowCardSave">
+		<div class="row">
+			<div class="col-md-5">
+				<div class="form-group">
+					<div clas="checkbox">
+						<label>
+							<input type="checkbox" ng-model="saveCard"> Save Credit Card
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>

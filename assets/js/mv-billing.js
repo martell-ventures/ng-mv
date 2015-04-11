@@ -325,16 +325,23 @@
 				expirationMonth: "=",
 				expirationYear: "=",
 				securityCode: "=",
+				saveCard: "=?",
 			},
       link: function($scope, $element, $attrs) {
-				$scope.years= [];
+				$scope.state= {
+					years: [],
+					months: [],
+					allowCardSave: $scope.saveCard===undefined ? false : true
+				};
+
 				var dt= new Date();
 				for(var ii= 0; ii<10; ii++)
 				{
 					var year= dt.getFullYear()+ii;
-					$scope.years.push({ label: year, value: year});
+					$scope.state.years.push({ label: year, value: year});
 				}
-				$scope.months= [
+				
+				$scope.state.months= [
 					{ label: '1 - January', value: 1 },
 					{ label: '2 - February', value: 2 },
 					{ label: '3 - March', value: 3 },

@@ -1,12 +1,7 @@
 {
   "name": "ng-mv",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "Martell Ventures Angular Components",
-  "keywords": [
-    "Martell",
-    "Ventures",
-    "LLC"
-  ],
 	"main": "./dist/mv.js",
   "authors": [
     "Ryan Martell",
@@ -20,5 +15,10 @@
 		"bower_components",
 		"test",
 		"tests"
-	]
+	],
+  "devDependencies": {
+		"angular": "1.3.11",
+		"bootstrap": "~3.3.2",
+    "angular-bootstrap": "0.11.2"
+	}
 }

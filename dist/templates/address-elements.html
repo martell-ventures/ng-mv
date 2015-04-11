@@ -23,7 +23,7 @@
 	<select ng-show="countryObject.States" class="form-control" ng-model="state" ng-options="s.Abbreviation as s.Name for s in countryObject.States" ng-required="requiredFields['state']"></select>
 	<input ng-hide="countryObject.States" class="form-control" type="text" ng-model="state" ng-required="requiredFields['state']"></input>
 </div>
-<div class="form-group" ng-show="country=='US'">
+<div class="form-group">
 	<label>{{ countryObject.PostalLabel || 'Postal Code' }}</label>
 	<input class="form-control" type="text" ng-model="zip" placeholder="Zip" ng-required="requiredFields['zip']"></input>
 </div>
