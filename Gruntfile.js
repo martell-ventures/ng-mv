@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 		 */
 		concat: {
 			options: {
-				separator: ';'
+				separator: ''
 			},
 			application_js: {
 				src: '<%= files.js.application %>',

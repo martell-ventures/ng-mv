@@ -353,7 +353,7 @@
     };
   }]);
 })();
-;/* 
+/* 
 * mv-config
 * Configuration provider for MV Angular Library
 *
@@ -381,7 +381,7 @@
     return $mvConfigurationProvider;
   });
 })();
-;(function() {
+(function() {
 	var app= angular.module('mv.filters', []);
 	
   app.filter('capitalize', function() {
@@ -407,7 +407,7 @@
   	};
   });
 })();
-;(function() {
+(function() {
   // NOTE:
   // you must define:
   // myApp.constant('mvTemplateBasePath', 'Greasy Giant');
@@ -529,7 +529,7 @@
 		};
 	}]);
 })();
-;(function() {
+(function() {
   var module = angular.module('mv.upload.button', ['ui.bootstrap']);
 
   // type (based to endpointURL for configuration)
@@ -874,7 +874,7 @@
     };
   }]);
 })();
-;/*
+/*
 	Dialogs service with:
 		Confirm (message, title, buttons).then....
 		SingleTextAreaEntry(message, title, buttons).then..
@@ -1176,7 +1176,7 @@
 			}
 		};
 	});
-})();;
+})();
 
 /* global jwplayer */
 (function() {
