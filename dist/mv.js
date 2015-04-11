@@ -352,7 +352,13 @@
       }
     };
   }]);
-})();;(function() {
+})();
+;/* 
+* mv-config
+* Configuration provider for MV Angular Library
+*
+*/
+(function() {
 	var module = angular.module('mv.configuration', []);
 
   module.provider('$mvConfiguration', function() {
@@ -374,7 +380,7 @@
     
     return $mvConfigurationProvider;
   });
-}());
+})();
 ;(function() {
 	var app= angular.module('mv.filters', []);
 	
@@ -1170,7 +1176,9 @@
 			}
 		};
 	});
-})();;/* global jwplayer */
+})();;
+
+/* global jwplayer */
 (function() {
   var module = angular.module('mv.widgets', []);
 
@@ -1348,5 +1356,4 @@
       }
     };
   });
-    
 })();

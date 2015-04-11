@@ -1,3 +1,5 @@
+
+
 /* global jwplayer */
 (function() {
   var module = angular.module('mv.widgets', []);
@@ -176,5 +178,4 @@
       }
     };
   });
-    
 })();

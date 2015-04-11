@@ -1,3 +1,8 @@
+/* 
+* mv-config
+* Configuration provider for MV Angular Library
+*
+*/
 (function() {
 	var module = angular.module('mv.configuration', []);
 
@@ -20,4 +25,4 @@
     
     return $mvConfigurationProvider;
   });
-}());
+})();
