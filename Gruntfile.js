@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 		output: {
 			templates: 'dist/templates',
 			js: {
-				application: 'dist/mv.js'
+				application: 'dist/mv'
 			}
 		},
 
