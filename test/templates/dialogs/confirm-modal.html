@@ -1,0 +1,9 @@
+<div class="modal-header">
+    <h3 class="modal-title">{{ title }}</h3>
+</div>
+<div class="modal-body">
+	<p ng-bind-html="message"></p>
+</div>
+<div class="modal-footer">
+	<button class="btn" ng-class="{ 'btn-primary' : button.type=='ok', 'btn-warning' : button.type=='cancel'}" ng-repeat="button in buttons" ng-click="clickButton(button)">{{ button.name }}</button>
+</div>

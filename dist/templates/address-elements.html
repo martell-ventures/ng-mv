@@ -4,26 +4,29 @@
 </div>
 <div class="form-group">
 	<label>Street</label>
-	<input class="form-control" type="text" ng-model="street" placeholder="1010 Main Street" ng-required="requiredFields['street']"></input>
+	<input class="form-control" type="text" ng-model="street" placeholder="1010 Main Street" show-validation-icon ng-required="requiredFields['street']"></input>
 </div>
 <div class="form-group" ng-show='useStreet2'>
 	<label>Street Line 2</label>
-	<input class="form-control" type="text" ng-model="street2" placeholder="Apt #12" ng-required="requiredFields['street2']"></input>
+	<input class="form-control" type="text" ng-model="street2" placeholder="Apt #12" show-validation-icon ng-required="requiredFields['street2']"></input>
 	<p class="help-block">
 	</p>
 </div>
 <div class="form-group">
 	<label>City</label>
-	<input class="form-control" type="text" ng-model="city" placeholder="City" ng-required="requiredFields['city']"></input>
+	<input class="form-control" type="text" ng-model="city" placeholder="City" show-validation-icon ng-required="requiredFields['city']"></input>
 	<p class="help-block">
 	</p>
 </div>
-<div class="form-group">
+<div class="form-group" ng-show="countryObject.States">
 	<label>{{ countryObject.StateLabel || 'State/Province/Region' }}</label>
-	<select ng-show="countryObject.States" class="form-control" ng-model="state" ng-options="s.Abbreviation as s.Name for s in countryObject.States" ng-required="requiredFields['state']"></select>
-	<input ng-hide="countryObject.States" class="form-control" type="text" ng-model="state" ng-required="requiredFields['state']"></input>
+	<select class="form-control" ng-model="state" show-validation-icon ng-options="s.Abbreviation as s.Name for s in countryObject.States" ng-required="requiredFields['state']"></select>
+</div>
+<div class="form-group" ng-hide="countryObject.States">
+	<label>{{ countryObject.StateLabel || 'State/Province/Region' }}</label>
+	<input class="form-control" type="text" ng-model="state" show-validation-icon ng-required="requiredFields['state']"></input>
 </div>
 <div class="form-group">
 	<label>{{ countryObject.PostalLabel || 'Postal Code' }}</label>
-	<input class="form-control" type="text" ng-model="zip" placeholder="Zip" ng-required="requiredFields['zip']"></input>
+	<input class="form-control" type="text" postal-code="country" ng-model="zip" placeholder="Zip" show-validation-icon ng-required="requiredFields['zip']"></input>
 </div>

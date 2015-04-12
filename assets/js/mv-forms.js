@@ -4,6 +4,103 @@
   // myApp.constant('mvTemplateBasePath', 'Greasy Giant');
 	var app = angular.module('mv.forms', ['mv.configuration']);
 
+	app.directive('postalCode', function() {
+		return {
+			require: '?ngModel',
+			restrict: 'A',
+			scope: {
+				countryCode: '=postalCode',
+			},
+			link: function($scope, $element, $attrs, ngModel) {
+				if(!ngModel) {
+					return;
+				}
+
+				// only valid is digits and space bar.
+				function parseUSZip(inputValue)
+				{
+					if (inputValue) {
+						var digits = inputValue.replace(/[^0-9 \-]/g, '');
+						if (digits !== inputValue) {
+							ngModel.$setViewValue(digits);
+							ngModel.$render();
+						}
+						return digits;
+					}
+					return undefined;
+				}
+				
+				function validUSZip(modelValue, viewValue) 
+				{
+					var value = modelValue || viewValue;
+					var valid;
+
+					// because we might not have this valid (because it could be invisible)
+					if($element.prop('required'))
+					{
+						// if digits only...
+						var digitsOnly = value.replace(/[^0-9]/g, '');
+						if(digitsOnly.length==9 || digitsOnly.length==5)
+						{
+							valid= true;
+						} else {
+							valid= false;
+						}
+					} else {
+						valid= true;
+					}
+					
+					return valid;
+				}
+
+				$scope.$watch('countryCode', function(newCode, oldCode) {
+					window.console.log("Country changed!");
+					if(newCode=='US')
+					{
+						ngModel.$parsers.unshift(parseUSZip);
+						if($element.prop('placeholder'))
+						{
+							$element.prop('placeholder', 'Zip');
+						}
+						ngModel.$validators.invalidUSZip = validUSZip;
+					} 
+					else if(newCode !== undefined)
+					{
+						if($element.prop('placeholder'))
+						{
+							$element.prop('placeholder', 'Postal Code');
+						}
+
+						// remove the us zip validator
+						delete ngModel.$validators.invalidUSZip; // this syntax seems so wrong to me.
+
+						// remove the us zip parser
+						var indexToRemove= -1;
+						angular.forEach(ngModel.$parsers, function(item, index) {
+							if(item===parseUSZip) {
+								indexToRemove= index;
+							}
+						});
+						
+						if(indexToRemove>=0) {
+							ngModel.$parsers.splice(indexToRemove, 1);
+						}
+					}
+					
+					// reflect any changes made
+					ngModel.$validate();
+				});
+				
+				$scope.$watch(function() {
+					return $element.attr('required');
+				}, function(newValue) {
+					debugger;
+					ngModel.$validate();
+				});
+			}
+		};
+	});
+
 	// NOTE: this is definitely different than before.
 	// update addressItem through a mapping table, ideally.
 	app.directive('mvAddress', ['$http', '$mvConfiguration', function($http, $mvConfiguration) {

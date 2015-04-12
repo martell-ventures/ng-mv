@@ -1,0 +1,14 @@
+<div class="modal-header">
+    <h3 class="modal-title">{{ title }}</h3>
+</div>
+<div class="modal-body">
+	<form novalidation>
+		<div class="form-group">
+			<label ng-bind-html="message"></label>
+			<textarea ng-model="params.textAreaEntry" class="form-control" style="width: 100%; max-width: 100%"></textarea>
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+	<button class="btn" ng-class="{ 'btn-primary' : button.type=='ok', 'btn-warning' : button.type=='cancel'}" ng-repeat="button in buttons" ng-click="clickButton(button)">{{ button.name }}</button>
+</div>
