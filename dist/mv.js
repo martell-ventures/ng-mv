@@ -30,7 +30,7 @@
 				type: 'amex',
 				pattern: /^3[47]/,
 				length: [15],
-				cvcLength: [3, 4],
+				cvcLength: [4],
 				luhn: true
 			}, 
 			{
@@ -1399,9 +1399,9 @@
         }
 
         $scope.$watch(function() {
-          return ngModel.$valid+'-'+ngModel.$valid;
+          return ngModel.$dirty+'-'+ngModel.$valid+'-'+ngModel.$touched;
         }, function() {
-          var showValidation= ngModel.$dirty || ngModel.$valid;
+          var showValidation= ngModel.$dirty || ngModel.$touched;// || ngModel.$valid;
           updateValidity(showValidation, ngModel.$valid);
         });
       }

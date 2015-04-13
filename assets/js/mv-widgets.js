@@ -53,9 +53,9 @@
         }
 
         $scope.$watch(function() {
-          return ngModel.$valid+'-'+ngModel.$valid;
+          return ngModel.$dirty+'-'+ngModel.$valid+'-'+ngModel.$touched;
         }, function() {
-          var showValidation= ngModel.$dirty || ngModel.$valid;
+          var showValidation= ngModel.$dirty || ngModel.$touched;// || ngModel.$valid;
           updateValidity(showValidation, ngModel.$valid);
         });
       }
