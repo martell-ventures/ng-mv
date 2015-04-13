@@ -132,9 +132,8 @@
 				if (!ngModel) {
 					return; // do nothing if no ng-model
 				}
-				// only valid is digits
-				ngModel.$parsers.unshift(function (inputValue)
-				{
+				
+				function onlyDigitsParser(inputValue) {
 					if (inputValue) {
 						var digits = inputValue.replace(/[^0-9]/g, '');
 						if (digits !== inputValue) {
@@ -144,17 +143,35 @@
 						return digits;
 					}
 					return undefined;
-				});
-
-				ngModel.$validators.invalidSecurityCode = function(modelValue, viewValue) {
+				}
+				
+				ngModel.$validators.validSecurityCode= function(modelValue, viewValue) {
+					var valid= false;
 					var card= creditCards.fromNumber($scope.cardNumber);
 					if(!card || !creditCards.cvcValidForCard(card, viewValue))
 					{
-						return false;
+						valid= false;
 					} else {
-						return true;
+						valid= true;
 					}
+					
+					if(!$element.prop('required'))
+					{
+						valid= true;
+					}
+					
+					return valid;
 				};
+				
+				// only valid is digits
+				ngModel.$parsers.unshift(onlyDigitsParser);
+
+				// if we change required state, remove the invalidSecurity code watcher...
+				$scope.$watch(function() {
+					return $element.prop('required');
+				}, function(newValue) {
+					ngModel.$validate();
+				});
 
 				$scope.$watch('cardNumber', function() {
 					var card= creditCards.fromNumber($scope.cardNumber);
@@ -162,10 +179,8 @@
 					// this mightshould be in the parser; we could make sure it's the right length
 					if(card)
 					{
-						$element.attr('minLength', card.cvcLength[0]);
 						$element.attr('maxLength', (card.cvcLength.length==2) ? card.cvcLength[1] : card.cvcLength[0]);
 					} else {
-						$element.attr('minLength', 3);
 						$element.attr('maxLength', 4);
 					}
 					
@@ -187,10 +202,8 @@
 				if (!ngModel) {
 					return; // do nothing if no ng-model
 				}
-
-				// only valid is digits and space bar.
-				ngModel.$parsers.unshift(function (inputValue)
-				{
+				
+				function digitsAndSpaceParser(inputValue) {
 					if (inputValue) {
 						var digits = inputValue.replace(/[^0-9 ]/g, '');
 						if (digits !== inputValue) {
@@ -200,43 +213,55 @@
 						return digits;
 					}
 					return undefined;
-				});
+				}
 
-				ngModel.$validators.invalidCardNumber = function(modelValue, viewValue) {
+				// valid card number
+				ngModel.$validators.validCardNumber= function(modelValue, viewValue) {
 					var value = modelValue || viewValue;
-					var valid = true;
+					var valid = false;
 
-					// because we might not have this valid (because it could be invisible)
-					if($element.prop('required'))
+					// if digits only...
+					var card= creditCards.fromNumber(value);
+					if(card)
 					{
-						valid = false;
-						// if digits only...
-						var card= creditCards.fromNumber(value);
-						if(card)
+						$scope.cardType= card.type;
+
+						var valueWithoutSpaces= value.replace(/ /g, '');
+						var numberOfSpaces= value.length - valueWithoutSpaces.length;
+
+						$element.attr('minLength', card.length[0] + numberOfSpaces);
+						$element.attr('maxLength', card.length[card.length.length-1] + numberOfSpaces);
+
+						// window.console.log("Card Type: "+card.type);
+						if(creditCards.numberValidForCard(card, value))
 						{
-							$scope.cardType= card.type;
-
-							var valueWithoutSpaces= value.replace(/ /g, '');
-							var numberOfSpaces= value.length - valueWithoutSpaces.length;
-
-							$element.attr('minLength', card.length[0] + numberOfSpaces);
-							$element.attr('maxLength', card.length[card.length.length-1] + numberOfSpaces);
-
-							// window.console.log("Card Type: "+card.type);
-							if(creditCards.numberValidForCard(card, value))
-							{
-								// window.console.log("Number valid for Type: "+card.type+ " value:"+value);
-								valid= true;
-							}
-						} else {
-							$scope.cardType= undefined;
-							$element.attr('minLength', 13);
-							$element.attr('maxLength', 16);
+							// window.console.log("Number valid for Type: "+card.type+ " value:"+value);
+							valid= true;
 						}
+					} else {
+						$scope.cardType= undefined;
+						$element.attr('minLength', 13);
+						$element.attr('maxLength', 16);
+					}
+
+					if(!$element.prop('required'))
+					{
+						valid= true;
 					}
 					
 					return valid;
 				};
+
+				// only valid is digits and space bar.
+				ngModel.$parsers.unshift(digitsAndSpaceParser);
+				
+				// so we can use credit cards on forms that are hidden, we want to be able to turn off validation with required.  That's what this
+				// does.
+				$scope.$watch(function() { 
+					return $element.prop('required');
+				}, function(newValue) {
+					ngModel.$validate();
+				});
 			}
 		};
 	}]);
@@ -248,26 +273,32 @@
 			scope: {
 				expirationYear: '='
 			},
-			link: function(scope, element, attrs, ngModel) {
+			link: function($scope, $element, $attrs, ngModel) {
 				if (!ngModel) {
 					return; // do nothing if no ng-model
 				}
 
-				scope.$watch('expirationYear', function() {
-					ngModel.$setValidity('expirationMonth', scope.validMonth(ngModel.$viewValue));
-				});
-
-				ngModel.$validators.expirationMonth = function(modelValue, viewValue) {
-					var value = modelValue || viewValue;
-					return scope.validMonth(value);
-				};
-
-				scope.validMonth= function(value)
+				if($element.prop('tagName')=='SELECT')
 				{
-					var valid= true;
-					if(scope.expirationYear)
+					var monthNames = ["January", "February", "March", "April", "May", "June",
+						"July", "August", "September", "October", "November", "December"
+					];
+					for(var ii= 0; ii<monthNames.length; ii++)
 					{
-						var expirationYear= parseInt(scope.expirationYear);
+						var monthNumber= ii+1;
+						var option= angular.element('<option value="'+monthNumber+'">'+monthNumber+' - '+monthNames[ii]+'</option>');
+						$element.append(option);
+					}
+				}
+
+				ngModel.$validators.validExpirationMonth= function(modelValue, viewValue)
+				{
+					var value = modelValue || viewValue;
+					var valid= true;
+					
+					if($scope.expirationYear)
+					{
+						var expirationYear= parseInt($scope.expirationYear);
 						// check it..
 						var dt= new Date();
 						var expMonth= parseInt(value) - 1; //dt.getMonth() is 0-11
@@ -278,8 +309,23 @@
 						}
 					}
 					
+					if(!$element.prop('required'))
+					{
+						valid= true;
+					}
+
 					return valid;
 				};
+				
+				$scope.$watch('expirationYear', function() {
+					ngModel.$validate();
+				});
+				
+				$scope.$watch(function() {
+					return $element.prop('required');
+				}, function(newValue) {
+					ngModel.$validate();
+				});
 			}
 		};
 	});
@@ -288,18 +334,41 @@
 		return {
 			restrict: 'A',
 			require: '?ngModel',
-			link: function(scope, element, attrs, ngModel) {
+			link: function($scope, $element, $attrs, ngModel) {
 				if (!ngModel) {
 					return; // do nothing if no ng-model
 				}
+				
+				if($element.prop('tagName')=='SELECT')
+				{
+					var dt= new Date();
+					for(var ii= 0; ii<10; ii++)
+					{
+						var year= dt.getFullYear()+ii;
+						var option= angular.element('<option value="'+year+'">'+year+'</option>');
+						$element.append(option);
+					}
+				}
 
-				ngModel.$validators.expirationYear = function(modelValue, viewValue) {
+				ngModel.$validators.validExpirationYear= function(modelValue, viewValue) {
 					var value = modelValue || viewValue;
 					var dt= new Date();
 					var expirationYear= parseInt(value);
+
+					var valid= ((expirationYear < dt.getFullYear()) ? false : true);
+					if(!$element.prop('required'))
+					{
+						valid= true;
+					}
 					
-					return ((expirationYear < dt.getFullYear()) ? false : true);
+					return valid;
 				};
+
+				$scope.$watch(function() {
+					return $element.prop('required');
+				}, function(newValue) {
+					ngModel.$validate();
+				});
 			}
 		};
 	});
@@ -326,36 +395,23 @@
 				expirationYear: "=",
 				securityCode: "=",
 				saveCard: "=?",
+				cardRequired: "=?"
 			},
       link: function($scope, $element, $attrs) {
 				$scope.state= {
-					years: [],
 					months: [],
-					allowCardSave: $scope.saveCard===undefined ? false : true
+					allowCardSave: $scope.saveCard===undefined ? false : true,
+					required: true,
 				};
-
-				var dt= new Date();
-				for(var ii= 0; ii<10; ii++)
-				{
-					var year= dt.getFullYear()+ii;
-					$scope.state.years.push({ label: year, value: year});
-				}
 				
-				$scope.state.months= [
-					{ label: '1 - January', value: 1 },
-					{ label: '2 - February', value: 2 },
-					{ label: '3 - March', value: 3 },
-					{ label: '4 - April', value: 4 },
-					{ label: '5 - May', value: 5 },
-					{ label: '6 - June', value: 6 },
-					{ label: '7 - July', value: 7 },
-					{ label: '8 - August', value: 8 },
-					{ label: '9 - September', value: 9 },
-					{ label: '10 - October', value: 10 },
-					{ label: '11 - November', value: 11 },
-					{ label: '12 - December', value: 12 },
-				];
-        
+				$scope.$watch('cardRequired', function(newValue) {
+					if(newValue===undefined)
+					{
+						$scope.state.required= true;
+					} else {
+						$scope.state.required= newValue;
+					}
+				});
       }
     };
   }]);

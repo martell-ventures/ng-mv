@@ -13,22 +13,26 @@
 		<div class="col-md-6">
 			<h3>Credit Card Form</h3>
 			<div class="well">
-				<form name="cardForm" ng-init="card= { save: false }" novalidation>
+				<form name="cardForm" ng-init="card= { save: false }; state= { showJSON: false, cardRequired: true };" novalidation>
+					<div class="checkbox">
+						<label><input type="checkbox" ng-model="state.cardRequired"></input> Card Info Required</label>
+					</div>
 					<credit-card-information 
 						cardholder-name="card.name" 
 						card-number="card.number" 
 						card-type="card.type"
 						expiration-month="card.expirationMonth" 
 						expiration-year="card.expirationYear" 
-						security-code="card.cvv",
-						card-required="card.required"
-						save-card="card.save">
+						security-code="card.cvv"
+						save-card="card.save"
+						card-required="state.cardRequired">
 					</credit-card-information>
 					<a class="btn btn-primary" ng-disabled="cardForm.$invalid">Submit</a>
 					<div class="checkbox">
-						<label><input type="checkbox" ng-model="card.showJSON"></input> Show JSON</label>
+						<label><input type="checkbox" ng-model="state.showJSON"></input> Show JSON</label>
 					</div>
-					<pre ng-show="card.showJSON">{{ card | json }}</pre>
+					<pre ng-show="state.showJSON">{{ card | json }}</pre>
+					<pre ng-show="state.showJSON">{{ cardForm | json }}</pre>
 				</form>
 			</div>
 		</div>

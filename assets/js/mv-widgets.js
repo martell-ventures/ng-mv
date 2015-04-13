@@ -52,7 +52,9 @@
           }
         }
 
-        $scope.$watch($attrs.ngModel, function() {
+        $scope.$watch(function() {
+          return ngModel.$valid+'-'+ngModel.$valid;
+        }, function() {
           var showValidation= ngModel.$dirty || ngModel.$valid;
           updateValidity(showValidation, ngModel.$valid);
         });

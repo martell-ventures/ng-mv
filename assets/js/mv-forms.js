@@ -34,12 +34,11 @@
 				function validUSZip(modelValue, viewValue) 
 				{
 					var value = modelValue || viewValue;
-					var valid;
-
-					// because we might not have this valid (because it could be invisible)
-					if($element.prop('required'))
+					var valid= false;
+					
+					// if digits only...
+					if($scope.countryCode=='US')
 					{
-						// if digits only...
 						var digitsOnly = value.replace(/[^0-9]/g, '');
 						if(digitsOnly.length==9 || digitsOnly.length==5)
 						{
@@ -51,8 +50,22 @@
 						valid= true;
 					}
 					
+					if(!$element.prop('required'))
+					{
+						valid= true;
+					}
+					
 					return valid;
 				}
+
+				
+				if($element.prop('required'))
+				{
+					ngModel.$validators.validUSZip = validUSZip;
+				}
+				
+				// add our validator..
+				ngModel.$validators.validUSZip= validUSZip;
 
 				$scope.$watch('countryCode', function(newCode, oldCode) {
 					window.console.log("Country changed!");
@@ -63,7 +76,6 @@
 						{
 							$element.prop('placeholder', 'Zip');
 						}
-						ngModel.$validators.invalidUSZip = validUSZip;
 					} 
 					else if(newCode !== undefined)
 					{
@@ -71,9 +83,6 @@
 						{
 							$element.prop('placeholder', 'Postal Code');
 						}
-
-						// remove the us zip validator
-						delete ngModel.$validators.invalidUSZip; // this syntax seems so wrong to me.
 
 						// remove the us zip parser
 						var indexToRemove= -1;
@@ -93,9 +102,8 @@
 				});
 				
 				$scope.$watch(function() {
-					return $element.attr('required');
+					return $element.prop('required');
 				}, function(newValue) {
-					debugger;
 					ngModel.$validate();
 				});
 			}
