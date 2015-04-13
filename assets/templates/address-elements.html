@@ -9,14 +9,10 @@
 <div class="form-group" ng-show='useStreet2'>
 	<label>Street Line 2</label>
 	<input class="form-control" type="text" ng-model="street2" placeholder="Apt #12" show-validation-icon ng-required="requiredFields['street2']"></input>
-	<p class="help-block">
-	</p>
 </div>
 <div class="form-group">
 	<label>City</label>
 	<input class="form-control" type="text" ng-model="city" placeholder="City" show-validation-icon ng-required="requiredFields['city']"></input>
-	<p class="help-block">
-	</p>
 </div>
 <div class="form-group" ng-show="countryObject.States">
 	<label>{{ countryObject.StateLabel || 'State/Province/Region' }}</label>

@@ -1,0 +1,3 @@
+bower install ng-mv=http://public_git.martellventures.com/ng-mv.git/#0.0.5 --save
+
+

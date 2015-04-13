@@ -10,7 +10,7 @@
 *
 */
 (function() {
-	var module = angular.module('mv.billing', ['mv.configuration']);
+	var module = angular.module('mv.billing', ['mv.configuration', 'mv.widgets']);
 
 	module.factory('creditCards', [function() {
 		var cardInfo= [

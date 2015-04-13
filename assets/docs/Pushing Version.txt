@@ -1,0 +1,8 @@
+To push a new version, you would use:
+
+git tag -a v0.0.5 -m "Address information and Credit Card cleanup"
+git push origin v0.0.5
+
+To list the current tags:
+
+git tag -l
