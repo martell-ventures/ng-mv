@@ -3,7 +3,7 @@
 	// Post testing.
   // you must define:
   // myApp.constant('mvTemplateBasePath', 'Greasy Giant');
-	var app = angular.module('mv.forms', ['mv.configuration']);
+	var app = angular.module('mv.forms', ['mv.configuration', 'mv.widgets']);
 
 	app.directive('postalCode', function() {
 		return {
