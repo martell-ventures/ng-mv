@@ -8,7 +8,7 @@
 
 	<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
 </head>
-<body>
+<body ng-controller="TestController">
 	<div class="container">
 		<div class="col-md-6">
 			<h3>Credit Card Form</h3>
@@ -67,10 +67,15 @@
 							</div>
 						</div>
 					</div>
-					<div>
+					<div class="form-group">
 						<a class="btn btn-primary btn-sm" ng-click="address.street='19 Haywood St.'; address.city='Asheville'; address.state='NC'; address.country='US'; address.zip='28801';">US Address</a>
 						<a class="btn btn-primary btn-sm" ng-click="address.street='Houghton Street'; address.city='London'; address.state=''; address.country='GB'; address.zip='WC2A 2AE';">UK Address</a>
 						<a class="btn btn-primary btn-sm" ng-click="address.street='453 W 12th Ave'; address.city='Vancouver'; address.state='BC'; address.country='CA'; address.zip='V5Y 1V4';">CA Address</a>
+					</div>
+					<div class="form-group">
+						<a class="btn btn-primary btn-sm" ng-click="showAddressDialog('us')">US Address Dialog</a>
+						<a class="btn btn-primary btn-sm" ng-click="showAddressDialog('ca')">CA Address Dialog</a>
+						<a class="btn btn-primary btn-sm" ng-click="showAddressDialog('gb')">GB Address Dialog</a>
 					</div>
 					<mv-address
 						street="address.street"
@@ -112,6 +117,35 @@
 	</div>
 </body>
 
+<script type="text/ng-template" id="addressDialog.html">
+<div class="modal-header">
+	<h4 class="modal-title text-center">Address Testing</h4>
+</div>
+<div class="modal-body">
+	<form name="addressDialogForm" novalidation>
+		<mv-address
+			street="address.street"
+			street2="address.street2"
+			city="address.city"
+			state="address.state"
+			zip="address.zip"
+			country="address.country"
+			required-fields="state.requiredFields"
+			use-street-2="address.useStreet2">
+		</mv-address>
+		<a class="btn btn-primary" ng-disabled="addressDialogForm.$invalid">Submit</a>
+		<div class="checkbox">
+			<label><input type="checkbox" ng-model="state.showJSON"></input> Show JSON</label>
+		</div>
+		<pre ng-show="state.showJSON">{{ address | json }}</pre>
+	</form>
+</div>
+<div class="modal-footer">
+	<a class="btn btn-warning" ng-click="cancel()">Cancel</a>
+	<a class="btn btn-primary" ng-click="ok()">OK</a>
+</div>
+</script>
+
 <script>
 	var app= angular.module('myApp', ['mv.configuration', 'mv.billing', 'mv.filters', 'mv.forms', 'mv.upload.button', 'mv.utils', 'mv.widgets']);
 
@@ -119,6 +153,67 @@
     app.config(["$mvConfigurationProvider", function(mvConfig) {
       mvConfig.setTemplateBasePath('/templates/');
     }]);
+	
+	app.controller("TestController", ['$scope', '$modal', function($scope, $modal) {
+		$scope.showAddressDialog= function(which) {
+			var modalInstance= $modal.open({
+				templateUrl: 'addressDialog.html',
+				controller: ['$scope', '$modalInstance', 'address', function($scope, $modalInstance, address) {
+					$scope.state= {
+						showJSON: false,
+						requiredFields: {
+							street: true,
+							city: true,
+							state: true,
+							country: true,
+							zip: true
+						}
+					};
+					$scope.address= address;
+					
+					$scope.cancel= function() {
+						$modalInstance.dismiss();
+					};
+					
+					$scope.ok= function() {
+						$modalInstance.close($scope.address);
+					}
+				}],
+				resolve: {
+					address: function() {
+						var address= {};
+						switch(which)
+						{
+						case 'us':
+							address.street='19 Haywood St.'; 
+							address.city='Asheville'; 
+							address.state='NC'; 
+							address.country='US'; 
+							address.zip='28801';
+							break;
+						case 'gb':
+							address.street='Houghton Street'; 
+							address.city='London'; 
+							address.state=''; 
+							address.country='GB'; 
+							address.zip='WC2A 2AE';
+							break;
+						case 'ca':
+							address.street='453 W 12th Ave'; 
+							address.city='Vancouver'; 
+							address.state='BC'; 
+							address.country='CA'; 
+							address.zip='V5Y 1V4';
+							break;
+						}
+						return address;
+					},
+				}
+			}).result.then(function(data) {
+				debugger;
+			});
+		};
+	}]);
 	
 	angular.element(document).ready(function() {
 		angular.bootstrap(document, ['myApp']);

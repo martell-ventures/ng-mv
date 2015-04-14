@@ -39,7 +39,7 @@
 					// if digits only...
 					if($scope.countryCode=='US')
 					{
-						var digitsOnly = value.replace(/[^0-9]/g, '');
+						var digitsOnly = value ? value.replace(/[^0-9]/g, '') : '';
 						if(digitsOnly.length==9 || digitsOnly.length==5)
 						{
 							valid= true;
@@ -130,17 +130,16 @@
 				useStreet2: "=?", //optional, set to true if you want to use street address line 2 field
 			},
 			link: function($scope, $element, $attrs) {
-				$scope.countryObject= {};
-				$scope.countries = [];
+				var lastSelectedState= {};
+				$scope.countries= [];
 
-				// fill in sane values; note that the country is set below.
+					// fill in sane values; note that the country is set below.
+				// FIXME: I'd like to remove this, but unsure if I can safely based on other places that might expect these to have fields.
 				if (!$scope.street) {
 					$scope.street = '';
 				}
-				if ($scope.useStreet2) {
-					if (!$scope.street2) {
-						$scope.street2 = '';
-					}
+				if ($scope.useStreet2 && !$scope.street2) {
+					$scope.street2 = '';
 				}
 				if (!$scope.city) {
 					$scope.city = '';
@@ -151,7 +150,7 @@
 				if (!$scope.zip) {
 					$scope.zip = '';
 				}
-				
+
 				// store this, so when we setup the country value, we restore if one was set on initial.
 				if($scope.state && $scope.country)
 				{
@@ -194,13 +193,11 @@
 					}
 				});
 				
-				var lastSelectedState= {};
 				$scope.$watch('state', function(newValue, oldValue) {
 					if(newValue !== oldValue) {
 						lastSelectedState[$scope.country]= newValue;
 					}
 				});
-
 
 				$scope.stateRequired= function() {
 					var req;
