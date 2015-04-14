@@ -57,18 +57,11 @@
 					
 					return valid;
 				}
-
-				
-				if($element.prop('required'))
-				{
-					ngModel.$validators.validUSZip = validUSZip;
-				}
 				
 				// add our validator..
 				ngModel.$validators.validUSZip= validUSZip;
 
 				$scope.$watch('countryCode', function(newCode, oldCode) {
-					window.console.log("Country changed!");
 					if(newCode=='US')
 					{
 						ngModel.$parsers.unshift(parseUSZip);
@@ -175,12 +168,47 @@
 					}
 				});
 				
+				// this is for the case where you change the model value directly.
+				$scope.$watch('country', function(newValue) {
+					if($scope.countryObject && newValue != $scope.countryObject.Code)
+					{
+						var changed= false;
+						angular.forEach($scope.countries, function(item) {
+							if(item.Code==newValue)
+							{
+								window.console.log("Change the country object!");
+								$scope.countryObject= item;
+								changed= true;
+							}
+						});
+						
+						if(!changed) {
+							window.console.log("Change the country object; country "+newValue+" NOT FOUND!");
+						}
+					}
+				});
+				
 				var lastSelectedState= {};
 				$scope.$watch('state', function(newValue, oldValue) {
 					if(newValue !== oldValue) {
 						lastSelectedState[$scope.country]= newValue;
 					}
 				});
+
+
+				$scope.stateRequired= function() {
+					var req;
+					
+					if($scope.country=='US' || $scope.country=='CA')
+					{
+						req= $scope.requiredFields['state'];
+					} else {
+						// we don't know if these have states or regions, so don't require it.
+						req= false;
+					}
+						
+					return req;
+				};
 
 				function MatchToNameOrAbbreviation(test, arr) {
 					var selected = null;

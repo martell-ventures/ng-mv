@@ -529,18 +529,11 @@
 					
 					return valid;
 				}
-
-				
-				if($element.prop('required'))
-				{
-					ngModel.$validators.validUSZip = validUSZip;
-				}
 				
 				// add our validator..
 				ngModel.$validators.validUSZip= validUSZip;
 
 				$scope.$watch('countryCode', function(newCode, oldCode) {
-					window.console.log("Country changed!");
 					if(newCode=='US')
 					{
 						ngModel.$parsers.unshift(parseUSZip);
@@ -647,12 +640,47 @@
 					}
 				});
 				
+				// this is for the case where you change the model value directly.
+				$scope.$watch('country', function(newValue) {
+					if($scope.countryObject && newValue != $scope.countryObject.Code)
+					{
+						var changed= false;
+						angular.forEach($scope.countries, function(item) {
+							if(item.Code==newValue)
+							{
+								window.console.log("Change the country object!");
+								$scope.countryObject= item;
+								changed= true;
+							}
+						});
+						
+						if(!changed) {
+							window.console.log("Change the country object; country "+newValue+" NOT FOUND!");
+						}
+					}
+				});
+				
 				var lastSelectedState= {};
 				$scope.$watch('state', function(newValue, oldValue) {
 					if(newValue !== oldValue) {
 						lastSelectedState[$scope.country]= newValue;
 					}
 				});
+
+
+				$scope.stateRequired= function() {
+					var req;
+					
+					if($scope.country=='US' || $scope.country=='CA')
+					{
+						req= $scope.requiredFields['state'];
+					} else {
+						// we don't know if these have states or regions, so don't require it.
+						req= false;
+					}
+						
+					return req;
+				};
 
 				function MatchToNameOrAbbreviation(test, arr) {
 					var selected = null;
@@ -1345,41 +1373,6 @@
 		};
 	});
   
-  //Limits an input to 160 characters (specifically tag line)
-	app.directive('charLimit', function () {
-		return {
-			require: '?ngModel',
-			restrict: 'AC',
-			link: function ($scope, $element, $attr, ngModel) {
-				// defaulting to 160, as that's the limit that was hardocded before.
-				// I don't think this is necessary though, maxLength attribute does this already.
-				var limit= ($attr.charLimit.length===0 ? 160 : parseInt($attr.charLimit));
-
-				function parseWithLimit(val) {
-					var newval = '';
-					if(val) {
-						if (val.length > limit) {
-							newval = val.substr(0, limit);
-						} else {
-							newval = val;
-						}
-						
-						if (newval !== val) {
-							ngModel.$setViewValue(newval);
-							ngModel.$render();
-						}
-						
-						return newval;
-					}
-					return undefined;
-				}
-				
-				ngModel.$parsers.push(parseWithLimit);
-			}
-		};
-	});
-	
-
 	//automatically adds a comma for every thousands in an input box.  Only for display (non-comma number is preserved internally)
 	//taken from the fiddle in this question: http://stackoverflow.com/questions/24001895/angularjs-number-input-formatted-view
 	// rdm: added the only digits and commans parser to help keep this real.
@@ -1434,6 +1427,73 @@
 		};
 	}]);
 	
+	
+	
+	
+		/**
+		 * angular-elastic-input
+		 * A directive for AngularJS which automatically resizes the width of input field according to the content, while typing.
+		 * @author: Jacek Pulit <jacek.pulit@gmail.com>
+		 * @license: MIT License
+		 */
+	// started from there; modified as had issues with placeholder, etc.
+	//	'use strict';
+	//	angular.module('puElasticInput', []).directive('puElasticInput', function () {
+	app.directive('mvElasticInput', function () {
+		return {
+			require: "?ngModel",
+			restrict: 'A',
+			link: function postLink($scope, $element, $attrs, ngModel) {
+				var wrapper = angular.element('<div style="position:fixed; top:-999px; left:0;"></div>');
+				var mirror = angular.element('<span style="white-space:pre;"></span>');
+				var defaultMaxwidth = $element.css('maxWidth') === 'none' ? $element.parent().innerWidth() : $element.css('maxWidth');
+				$element.css('minWidth', $attrs.mvElasticInputMinwidth || $element.css('minWidth'));
+				$element.css('maxWidth', $attrs.mvElasticInputMaxwidth || defaultMaxwidth);
+				angular.forEach([
+					'fontFamily',
+					'fontSize',
+					'fontWeight',
+					'fontStyle',
+					'letterSpacing',
+					'textTransform',
+					'wordSpacing',
+					'textIndent',
+					'boxSizing',
+					'borderRightWidth',
+					'borderLeftWidth',
+					'borderLeftStyle',
+					'borderRightStyle',
+					'paddingLeft',
+					'paddingRight',
+					'marginLeft',
+					'marginRight'
+				], function (value) {
+					mirror.css(value, $element.css(value));
+				});
+
+				angular.element('body').append(wrapper.append(mirror));
+				function update() {
+					if($attrs.placeholder) {
+						mirror.text($element.val() || $attrs.placeholder);
+					} else {
+						mirror.text($element.val());
+					}
+					$element.css('width', mirror.outerWidth() + 1);
+				}
+			
+				update();
+				if (ngModel) {
+					$scope.$watch($attrs.ngModel, function () {
+						update();
+					});
+				} else {
+					$element.on('keydown keyup focus input propertychange change', function () {
+						update();
+					});
+				}
+			}
+		};
+	});
 })();
 
 /* global jwplayer */

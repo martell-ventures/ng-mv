@@ -10,10 +10,6 @@
 </head>
 <body>
 	<div class="container">
-		<div ng-init="charLimitTest= { first: '', second: '5000' }">
-			<input thousands-comma type="text" ng-model="charLimitTest.first"></input>
-			<input thousands-comma type="text" ng-model="charLimitTest.second"></input>
-		</div>
 		<div class="col-md-6">
 			<h3>Credit Card Form</h3>
 			<div class="well">
@@ -71,8 +67,11 @@
 							</div>
 						</div>
 					</div>
-					
-					
+					<div>
+						<a class="btn btn-primary btn-sm" ng-click="address.street='19 Haywood St.'; address.city='Asheville'; address.state='NC'; address.country='US'; address.zip='28801';">US Address</a>
+						<a class="btn btn-primary btn-sm" ng-click="address.street='Houghton Street'; address.city='London'; address.state=''; address.country='GB'; address.zip='WC2A 2AE';">UK Address</a>
+						<a class="btn btn-primary btn-sm" ng-click="address.street='453 W 12th Ave'; address.city='Vancouver'; address.state='BC'; address.country='CA'; address.zip='V5Y 1V4';">CA Address</a>
+					</div>
 					<mv-address
 						street="address.street"
 						street2="address.street2"
@@ -88,6 +87,25 @@
 						<label><input type="checkbox" ng-model="address.showJSON"></input> Show JSON</label>
 					</div>
 					<pre ng-show="address.showJSON">{{ address | json }}</pre>
+				</form>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<h3>Other Elements</h3>
+			<div class="well">
+				<form name="otherForm" novalidation ng-init="misc= { showJSON: false };">
+					<div class="form-group">
+						<label>Commas Input</label>
+						<input class="form-control" type="text" thousands-comma ng-model="misc.thousandsComma"></input>
+					</div>
+					<div class="form-group">
+						<label>Elastic Input</label>
+						<input class="form-control" type="text" mv-elastic-input ng-model="misc.elasticInput"></input>
+					</div>
+					<div class="checkbox">
+						<label><input type="checkbox" ng-model="misc.showJSON"></input> Show JSON</label>
+					</div>
+					<pre ng-show="misc.showJSON">{{ misc | json }}</pre>
 				</form>
 			</div>
 		</div>

@@ -16,11 +16,11 @@
 </div>
 <div class="form-group" ng-show="countryObject.States">
 	<label>{{ countryObject.StateLabel || 'State/Province/Region' }}</label>
-	<select class="form-control" ng-model="state" show-validation-icon ng-options="s.Abbreviation as s.Name for s in countryObject.States" ng-required="requiredFields['state']"></select>
+	<select class="form-control" ng-model="state" show-validation-icon ng-options="s.Abbreviation as s.Name for s in countryObject.States" ng-required="stateRequired()"></select>
 </div>
 <div class="form-group" ng-hide="countryObject.States">
 	<label>{{ countryObject.StateLabel || 'State/Province/Region' }}</label>
-	<input class="form-control" type="text" ng-model="state" show-validation-icon ng-required="requiredFields['state']"></input>
+	<input class="form-control" type="text" ng-model="state" show-validation-icon ng-required="stateRequired()"></input>
 </div>
 <div class="form-group">
 	<label>{{ countryObject.PostalLabel || 'Postal Code' }}</label>
