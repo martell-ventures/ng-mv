@@ -623,10 +623,16 @@
 				if (!$scope.zip) {
 					$scope.zip = '';
 				}
+				
+				// store this, so when we setup the country value, we restore if one was set on initial.
+				if($scope.state && $scope.country)
+				{
+					lastSelectedState[$scope.country]= $scope.state;
+				}
 
 				// change country; make sure state updates appropriately
 				$scope.$watch('countryObject', function(newValue) {
-					if(newValue != $scope.country)
+					if(newValue && newValue.Code != $scope.country)
 					{
 						$scope.country= newValue.Code;
 
@@ -673,7 +679,7 @@
 					
 					if($scope.country=='US' || $scope.country=='CA')
 					{
-						req= $scope.requiredFields['state'];
+						req= $scope.requiredFields && $scope.requiredFields['state'];
 					} else {
 						// we don't know if these have states or regions, so don't require it.
 						req= false;
