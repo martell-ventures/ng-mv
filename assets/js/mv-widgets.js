@@ -20,7 +20,8 @@
           formGroupParent.addClass('has-feedback');
         }
         var icon;
-        if($element.prop('tagName')=='INPUT')
+        // the icon only works on inputs that aren't in input-groups
+        if($element.prop('tagName')=='INPUT' && !$element.parent().hasClass('input-group'))
         {
           icon= angular.element('<span class=" form-control-feedback glyphicon glyphicon-ok hidden"></span>');
           $element.after(icon);

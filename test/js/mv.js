@@ -363,6 +363,11 @@
 					
 					return valid;
 				};
+				
+				// ngModel.$formatters.unshift(function () {
+				// 	debugger;
+				// 	return ngModel.$modelValue;
+				// });
 
 				$scope.$watch(function() {
 					return $element.prop('required');
@@ -372,7 +377,177 @@
 			}
 		};
 	});
-  
+
+	// <div class="form-group">
+	// 	<label>Expire</label>
+	// 	<input type="text" class="form-control" placeholder="MM/YY" credit-card-expiration-entry year="expirationYear" year-digits="2" month="expirationMonth" ng-model="monthYear"
+	// 	show-validation-icon ng-required="state.required"></input>
+	// </div>
+	module.directive('creditCardExpirationEntry', function() {
+		return {
+			restrict: 'A',
+			require: '?ngModel', 
+			scope: {
+				year: '=',
+				month: '=',
+				yearDigits: '@?'
+			},
+			link: function($scope, $element, $attrs, ngModel) {
+				var yearDigits= $attrs.yearDigits ? parseInt($attrs.yearDigits): 2;
+				if(!ngModel) {
+					return;
+				}
+
+//		<input type="text" credit-card-expiration-entry year="expirationYear" month="expirationMonth" ng-model="yearMonth"></input>
+				function parseExpirationMonthYear(inputValue)
+				{
+					if (inputValue) {
+						var digits = inputValue.replace(/[^0-9]/g, '');
+						if(digits.length==1)
+						{
+							if(digits.substr(0,1) != '0' && digits.substr(0,1) != '1')
+							{
+								digits= '';
+							}
+						}
+						if(digits.length==2)
+						{
+							if(digits.substr(0,1)=='1' && parseInt(digits.substr(1,1), 10)>2)
+							{
+								digits= digits.substr(0,1);
+							} 
+							else if(inputValue.length>=3 && inputValue.substr(2,1)=='/')
+							{
+								digits= inputValue.substr(0,3);
+							}
+						} 
+						else if(digits.length>2)
+						{
+							digits= digits.substr(0,2)+'/'+digits.substr(2);
+							digits= digits.substr(0, 3+yearDigits); // MM/YY
+						}
+
+						if (digits !== inputValue) {
+							ngModel.$setViewValue(digits);
+							ngModel.$render();
+						}
+						return digits;
+					}
+					return undefined;
+				}
+				
+				function getMonth(value) {
+					var result;
+					
+					if(value) {
+						var digits = value.replace(/[^0-9]/g, '');
+						if(digits.length>=2) {
+							result= parseInt(digits.substr(0,2), 10);
+						}
+					}
+					
+					return result;
+				}
+
+				function getYear(value) {
+					var result;
+					
+					if(value)
+					{
+						var digits = value.replace(/[^0-9]/g, '');
+						if(digits.length==2+yearDigits) {
+							if(yearDigits==2)
+							{
+								result= 2000 + parseInt(digits.substr(2,yearDigits), 10);
+							} else {
+								result= parseInt(digits.substr(2,yearDigits), 10);
+							}
+						}
+					}
+					
+					return result;
+				}
+
+				ngModel.$validators.validExpirationDate= function(modelValue, viewValue) 
+				{
+					var value = modelValue || viewValue;
+					var year= getYear(value);
+					var month= getMonth(value);
+					var valid= false;
+					
+					if(year !== undefined && month !== undefined)
+					{
+						var dt= new Date();
+						
+						if(year>dt.getFullYear())
+						{
+							valid= true;
+						} 
+						else if(year==dt.getFullYear() && month<=(dt.getMonth()+1)) //dt.getMonth() is 0-11
+						{
+							valid= true;
+						} 
+					}
+					
+					if(!$element.prop('required'))
+					{
+						valid= true;
+					}
+					
+					return valid;
+				};
+
+				ngModel.$parsers.unshift(parseExpirationMonthYear);
+
+				// this is only if both are on the same page, which you wouldn't do.
+				// $scope.$watch(function() {
+				// 	return $scope.year+'-'+$scope.month;
+				// }, function(newValue) {
+				// 	var r= '';
+				//
+				// 	if($scope.month !== undefined) {
+				// 		var m= parseInt($scope.month, 10);
+				// 		if(m<10) {
+				// 			r+= '0';
+				// 			r+= m;
+				// 		} else {
+				// 			r+= m;
+				// 		}
+				// 		r+= '/';
+				// 	}
+				//
+				// 	if($scope.year !== undefined) {
+				// 		var y= parseInt($scope.year, 10);
+				// 		if(yearDigits==2) {
+				// 			r+= $scope.year.substr(2,2);
+				// 		} else {
+				// 			r+= y;
+				// 		}
+				// 	}
+				//
+				// 	if(ngModel.$modelValue !== r)
+				// 	{
+				// 		ngModel.$setViewValue(r);
+				// 		ngModel.$render();
+				// 		ngModel.$validate();
+				// 	}
+				// });
+						
+				$scope.$watch(function() {
+					return ngModel.$modelValue;
+				}, function(newValue) {
+					if(newValue) {
+						$scope.month= ''+getMonth(newValue); // convert to string, so it interops with the select list.
+						$scope.year= ''+getYear(newValue);
+					} else {
+						$scope.month= undefined;
+						$scope.year= undefined;
+					}
+				});
+			}
+		};
+	});
+	
   module.directive('creditCardInformation', ['$mvConfiguration', 'creditCards', function($mvConfiguration, creditCards) {
 		return {
 			restrict: 'E',
@@ -382,7 +557,12 @@
 				{
 					result= $attrs.templateUrl;
 				} else {
-					result= $mvConfiguration.templateBasePath + 'credit-card-information.html';
+					if($attrs.typeExpiration !== undefined)
+					{
+						result= $mvConfiguration.templateBasePath + 'credit-card-information-type-expiration.html';
+					} else {
+						result= $mvConfiguration.templateBasePath + 'credit-card-information.html';
+					}
 				}
 
 				return result;
@@ -532,11 +712,11 @@
 				
 				// add our validator..
 				ngModel.$validators.validUSZip= validUSZip;
+				ngModel.$parsers.unshift(parseUSZip);
 
 				$scope.$watch('countryCode', function(newCode, oldCode) {
 					if(newCode=='US')
 					{
-						ngModel.$parsers.unshift(parseUSZip);
 						if($element.prop('placeholder'))
 						{
 							$element.prop('placeholder', 'Zip');
@@ -547,18 +727,6 @@
 						if($element.prop('placeholder'))
 						{
 							$element.prop('placeholder', 'Postal Code');
-						}
-
-						// remove the us zip parser
-						var indexToRemove= -1;
-						angular.forEach(ngModel.$parsers, function(item, index) {
-							if(item===parseUSZip) {
-								indexToRemove= index;
-							}
-						});
-						
-						if(indexToRemove>=0) {
-							ngModel.$parsers.splice(indexToRemove, 1);
 						}
 					}
 					
@@ -1519,7 +1687,8 @@
           formGroupParent.addClass('has-feedback');
         }
         var icon;
-        if($element.prop('tagName')=='INPUT')
+        // the icon only works on inputs that aren't in input-groups
+        if($element.prop('tagName')=='INPUT' && !$element.parent().hasClass('input-group'))
         {
           icon= angular.element('<span class=" form-control-feedback glyphicon glyphicon-ok hidden"></span>');
           $element.after(icon);

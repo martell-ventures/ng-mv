@@ -60,11 +60,11 @@
 				
 				// add our validator..
 				ngModel.$validators.validUSZip= validUSZip;
+				ngModel.$parsers.unshift(parseUSZip);
 
 				$scope.$watch('countryCode', function(newCode, oldCode) {
 					if(newCode=='US')
 					{
-						ngModel.$parsers.unshift(parseUSZip);
 						if($element.prop('placeholder'))
 						{
 							$element.prop('placeholder', 'Zip');
@@ -75,18 +75,6 @@
 						if($element.prop('placeholder'))
 						{
 							$element.prop('placeholder', 'Postal Code');
-						}
-
-						// remove the us zip parser
-						var indexToRemove= -1;
-						angular.forEach(ngModel.$parsers, function(item, index) {
-							if(item===parseUSZip) {
-								indexToRemove= index;
-							}
-						});
-						
-						if(indexToRemove>=0) {
-							ngModel.$parsers.splice(indexToRemove, 1);
 						}
 					}
 					

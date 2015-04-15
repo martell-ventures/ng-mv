@@ -11,16 +11,9 @@
 	<div class="col-md-5 col-sm-4 col-xs-6">
 		<div class="form-group">
 			<label>Expire</label>
-			<select class="form-control" credit-card-expiration-month expiration-year="expirationYear" ng-model="expirationMonth" show-validation-icon 
-			ng-required="state.required">
-			</select>
-		</div>
-	</div>
-	<div class="col-md-3 col-sm-4 col-xs-6">
-		<div class="form-group">
-			<label>&nbsp;</label>
-			<select class="form-control" credit-card-expiration-year ng-model="expirationYear" show-validation-icon ng-required="state.required">
-			</select>
+			<input type="text" class="form-control" placeholder="MM/YY" credit-card-expiration-entry year="expirationYear" year-digits="2" 
+			month="expirationMonth" ng-model="monthYear"
+			show-validation-icon ng-required="state.required"></input>
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-4 col-xs-4">

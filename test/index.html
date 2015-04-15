@@ -36,6 +36,34 @@
 				</form>
 			</div>
 		</div>
+
+		<div class="col-md-6">
+			<h3>Credit Card Form (Type Expiration)</h3>
+			<div class="well">
+				<form name="cardForm2" ng-init="card2= { save: false }; state2= { showJSON: false, cardRequired: true };" novalidation>
+					<div class="checkbox">
+						<label><input type="checkbox" ng-model="state2.cardRequired"></input> Card Info Required</label>
+					</div>
+					<credit-card-information 
+						cardholder-name="card2.name" 
+						card-number="card2.number" 
+						card-type="card2.type"
+						expiration-month="card2.expirationMonth" 
+						expiration-year="card2.expirationYear" 
+						security-code="card2.cvv"
+						save-card="card2.save"
+						card-required="state2.cardRequired"
+						type-expiration>
+					</credit-card-information>
+					<a class="btn btn-primary" ng-disabled="cardForm2.$invalid">Submit</a>
+					<div class="checkbox">
+						<label><input type="checkbox" ng-model="state2.showJSON"></input> Show JSON</label>
+					</div>
+					<pre ng-show="state2.showJSON">{{ card2 | json }}</pre>
+					<pre ng-show="state2.showJSON">{{ cardForm2 | json }}</pre>
+				</form>
+			</div>
+		</div>
 		<div class="col-md-6">
 			<h3>Address Form</h3>
 			<div class="well">
