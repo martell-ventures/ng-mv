@@ -483,7 +483,7 @@
 						{
 							valid= true;
 						} 
-						else if(year==dt.getFullYear() && month<=(dt.getMonth()+1)) //dt.getMonth() is 0-11
+						else if(year==dt.getFullYear() && month>(dt.getMonth()+1)) //dt.getMonth() is 0-11
 						{
 							valid= true;
 						} 
