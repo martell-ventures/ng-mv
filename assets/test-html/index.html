@@ -11,6 +11,16 @@
 <body ng-controller="TestController">
 	<div class="container">
 		<div class="col-md-6">
+			<a class="btn btn-primary" facebook-login-button facebook-callback="facebookResult(status, response)">Login with Facebook</a>
+			<div ng-show="facebook.response">
+				Result
+				<pre>{{ facebook | json }}</pre>
+			</div>
+		</div>
+		<div class="col-md-6">
+		</div>
+
+		<div class="col-md-6">
 			<h3>Credit Card Form</h3>
 			<div class="well">
 				<form name="cardForm" ng-init="card= { save: false }; state= { showJSON: false, cardRequired: true };" novalidation>
@@ -175,14 +185,38 @@
 </script>
 
 <script>
-	var app= angular.module('myApp', ['mv.configuration', 'mv.billing', 'mv.filters', 'mv.forms', 'mv.upload.button', 'mv.utils', 'mv.widgets']);
+	var app= angular.module('myApp', ['mv.configuration', 'mv.billing', 'mv.filters', 'mv.forms', 'mv.upload.button', 'mv.utils', 'mv.widgets', 'mv.facebook']);
 
     // configure the martell ventures stuff.
     app.config(["$mvConfigurationProvider", function(mvConfig) {
       mvConfig.setTemplateBasePath('/templates/');
     }]);
 	
+	app.config(['$mvFacebookConfigurationProvider', function(mvFacebookConfig) {
+		mvFacebookConfig.setApplicationID('1624852824413556'); // mv stuff.
+		mvFacebookConfig.setRedirectURL('http://ng-mv.local');
+	}]);
+	
 	app.controller("TestController", ['$scope', '$modal', function($scope, $modal) {
+		$scope.facebook= {
+			response: undefined
+		};
+		
+		$scope.facebookResult= function(status, response) {
+			$scope.facebook.status= status;
+			$scope.facebook.response= response;
+
+			switch(status)
+			{
+			case 'cancelled': // user cancelled login. (more info in response)
+				break;
+			case 'loadingError': // unable to load the facebook js stuff.
+				break;
+			case 'success': // logged in succesfully. (full info in response)
+				break;
+			}
+		};
+		
 		$scope.showAddressDialog= function(which) {
 			var modalInstance= $modal.open({
 				templateUrl: 'addressDialog.html',
