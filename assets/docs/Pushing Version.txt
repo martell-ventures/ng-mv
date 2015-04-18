@@ -1,7 +1,7 @@
 To push a new version, you would use:
 
-git tag -a v0.0.10 -m "More initial state version updates for MV Address"
-git push origin v0.0.10
+git tag -a v0.0.13 -m "Facebook button"
+git push origin v0.0.13
 
 To list the current tags:
 

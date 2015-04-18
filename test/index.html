@@ -3,6 +3,7 @@
 	<title>MV Test Harness</title>
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/angular.js"></script>
+	<script type="text/javascript" src="js/angular.js"></script>
 	<script type="text/javascript" src="js/ui-bootstrap-tpls.min.js"></script>
 	<script type="text/javascript" src="js/mv.js"></script>
 
@@ -18,6 +19,32 @@
 			</div>
 		</div>
 		<div class="col-md-6">
+			<h3>Flash Alert</h3>
+			<div class="well">
+				<form name="flashAlertTester" ng-init="flashparams= { type: 'error', message: 'Test Message', duration: 5000 }; flashalert= { };" novalidation>
+					<flash-alert type="flashalert.type" message="flashalert.message" duration="flashalert.duration"></flash-alert>
+					<div class="form-group">
+						<label>Type</label>
+						<select class="form-control" ng-model="flashparams.type" required>
+							<option value="info">Information</option>
+							<option value="warning">Warning</option>
+							<option value="error">Error</option>
+							<option value="success">Success</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label>Message</label>
+						<input class="form-control" type="text" ng-model="flashparams.message" required></input>
+					</div>
+					<div class="form-group">
+						<label>Duration (Milliseconds)</label>
+						<input class="form-control" type="number" ng-model="flashparams.duration" required></input>
+					</div>
+					<div class="form-group">
+						<a class="btn btn-primary" ng-click="testFlashAlert();">Test Flash Alert</a>
+					</div>
+				</form>
+			</div>
 		</div>
 
 		<div class="col-md-6">
@@ -197,9 +224,15 @@
 		mvFacebookConfig.setRedirectURL('http://ng-mv.local');
 	}]);
 	
-	app.controller("TestController", ['$scope', '$modal', function($scope, $modal) {
+	app.controller("TestController", ['$scope', '$modal', '$sce', function($scope, $modal, $sce) {
 		$scope.facebook= {
 			response: undefined
+		};
+		
+		$scope.testFlashAlert= function() {
+			$scope.flashalert.type= $scope.flashparams.type; 
+			$scope.flashalert.message= $sce.trustAsHtml($scope.flashparams.message); 
+			$scope.flashalert.duration= $scope.flashparams.duration;
 		};
 		
 		$scope.facebookResult= function(status, response) {
@@ -213,6 +246,19 @@
 			case 'loadingError': // unable to load the facebook js stuff.
 				break;
 			case 'success': // logged in succesfully. (full info in response)
+				// "response": {
+				//     "id": "1015272938234234",
+				//     "email": "email@domain.com",
+				//     "first_name": "FirstName",
+				//     "gender": "male",
+				//     "last_name": "LastName",
+				//     "link": "https://www.facebook.com/app_scoped_user_id/1015272938234234/",
+				//     "locale": "en_US",
+				//     "name": "FirstName LastName",
+				//     "timezone": -4,
+				//     "updated_time": "2014-08-11T19:12:29+0000",
+				//     "verified": true
+				//   },
 				break;
 			}
 		};

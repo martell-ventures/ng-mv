@@ -72,9 +72,9 @@
         duration: '=?'
       },
       template: 
-        '<div ng-show="visible" class="alert" ng-class="alertClass">'+
+        '<div ng-show="message" class="alert" ng-class="alertClass">'+
           '<button type="button" class="close" ng-click="visible= false">x</button>'+
-          '<strong>{{ strongText }}</strong><span ng-bind-html="message"></span>'+
+          '<strong>{{ strongText }}</strong> <span ng-bind-html="message"></span>'+
         '</div>',
       link: function($scope, $element, $attrs) {
         $scope.$watch('type', function() {
@@ -102,16 +102,13 @@
           }
         });
         
-        $scope.$watch('message', function() {
-          if($scope.message) {
-              var duration= $scope.duration || 5000;
-              // and make it fade out after a certain amount of time...
-              $timeout(function() {
-                $scope.visible= false;
-              }, duration);
-            
-            // start timeout.
-            $scope.visible= true;
+        $scope.$watch('message', function(newValue) {
+          if(newValue) {
+            var duration= $scope.duration || 5000;
+            // and make it fade out after a certain amount of time...
+            $timeout(function() {
+              $scope.message= undefined; // we have to do this as well, so that if they get the same error multiple times, it will show up!
+            }, duration);
           }
         });
       }
