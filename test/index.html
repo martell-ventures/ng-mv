@@ -12,10 +12,23 @@
 <body ng-controller="TestController">
 	<div class="container">
 		<div class="col-md-6">
-			<a class="btn btn-primary" facebook-login-button facebook-callback="facebookResult(status, response)">Login with Facebook</a>
-			<div ng-show="facebook.response">
-				Result
-				<pre>{{ facebook | json }}</pre>
+			<h3>Special Directives</h3>
+			<div class="well">
+				<form name="buttonForm" novalidation>
+					<div class="form-group">
+						<label>Facebook Login</label>
+						<a class="btn btn-primary btn-block" facebook-login-button="facebookResult(status, response)">Login with Facebook</a>
+						<div class="help-block" ng-show="facebook.response">
+							Result
+							<pre>{{ facebook | json }}</pre>
+						</div>
+					</div>
+					<div class="form-group" ng-init="enterExample= { type: 'info', message: undefined };">
+						<label>MV Enter example (Press Return in the following input field)</label>
+						<input class="form-control" mv-enter="mvEnterExample()"></input>
+						<flash-alert type="enterExample.type" message="enterExample.message"></flash-alert>
+					</div>
+				</form>
 			</div>
 		</div>
 		<div class="col-md-6">
@@ -233,6 +246,10 @@
 			$scope.flashalert.type= $scope.flashparams.type; 
 			$scope.flashalert.message= $sce.trustAsHtml($scope.flashparams.message); 
 			$scope.flashalert.duration= $scope.flashparams.duration;
+		};
+		
+		$scope.mvEnterExample= function() {
+			$scope.enterExample.message= $sce.trustAsHtml('Enter was pressed!'); 
 		};
 		
 		$scope.facebookResult= function(status, response) {

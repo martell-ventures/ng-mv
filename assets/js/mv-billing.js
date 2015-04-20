@@ -13,15 +13,19 @@
 	var module = angular.module('mv.billing', ['mv.configuration', 'mv.widgets']);
 
 	module.factory('creditCards', [function() {
+	  var defaultFormat = /(\d{1,4})/g;
+
 		var cardInfo= [
 			{
 				type: 'discover',
 				pattern: /^(6011|65|64[4-9]|622)/,
+				format: defaultFormat,
 				length: [16],
 				cvcLength: [3],
 				luhn: true
 			}, {
 				type: 'mastercard',
+				format: defaultFormat,
 				pattern: /^5[1-5]/,
 				length: [16],
 				cvcLength: [3],
@@ -29,6 +33,7 @@
 			}, {
 				type: 'amex',
 				pattern: /^3[47]/,
+				format: /(\d{1,4})(\d{1,6})?(\d{1,5})?/,
 				length: [15],
 				cvcLength: [4],
 				luhn: true
@@ -36,6 +41,7 @@
 			{
 				type: 'visa',
 				pattern: /^4/,
+				format: defaultFormat,
 				length: [13, 14, 15, 16],
 				cvcLength: [3],
 				luhn: true
@@ -104,6 +110,43 @@
 				}
 			
 				return valid;
+			},
+			
+			formatCardNumber: function(card, num) {
+				var groups, upperLength, ref;
+				
+				if (!card) {
+					return num;
+				}
+
+				upperLength = card.length[card.length.length - 1];
+				num = num.replace(/\D/g, '');
+				num = num.slice(0, +upperLength + 1 || 9e9);
+      
+				if(card.format.global) 
+				{
+					return (ref = num.match(card.format)) != null ? ref.join(' ') : void 0;
+				} 
+				else
+				{
+					groups = card.format.exec(num);
+
+					if (groups != null) {
+						groups.shift();
+
+						// have to remove the undefined from the array, or we'll get extra spaces.
+						var newGroups= [];
+						angular.forEach(groups, function(group) {
+							if(group)
+							{
+								newGroups.push(group);
+							}
+						});
+						groups= newGroups;
+					}
+					
+					return groups != null ? groups.join(' ') : void 0;
+				}
 			},
 			
 			cvcValidForCard: function(card, num) {
@@ -205,7 +248,15 @@
 				
 				function digitsAndSpaceParser(inputValue) {
 					if (inputValue) {
-						var digits = inputValue.replace(/[^0-9 ]/g, '');
+						var card= creditCards.fromNumber(inputValue);
+						var digits;
+						if(card)
+						{
+							digits= creditCards.formatCardNumber(card, inputValue);
+						} else {
+							digits = inputValue.replace(/[^0-9 ]/g, '');
+						}
+						
 						if (digits !== inputValue) {
 							ngModel.$setViewValue(digits);
 							ngModel.$render();
