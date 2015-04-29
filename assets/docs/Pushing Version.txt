@@ -1,7 +1,7 @@
 To push a new version, you would use:
 
-git tag -a v0.0.13 -m "Facebook button"
-git push origin v0.0.13
+git tag -a v0.0.15 -m "Facebook button redux, mvEnter, and CC # formatting"
+git push origin v0.0.15
 
 To list the current tags:
 

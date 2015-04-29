@@ -1,5 +1,5 @@
 (function() {
-  var module = angular.module('mv.upload.button', ['ui.bootstrap']);
+  var module = angular.module('mv.upload.button', []);
 
   // type (based to endpointURL for configuration)
   // accept - file[input] accept type
@@ -10,6 +10,8 @@
   // uploadProgress: '=?', // upload Progress
   // uploading: '=?', // true once we start uploading.
 	// defaultPreviewImage: '@' // default preview image (if not a image file)
+  // minImageWidth: @ // if present, minimum allowable image width
+  // minImageHeight: @ // if present, minimum allowable image height
   module.directive('mvInlineUploadButton', ['$q', '$http', '$parse', function($q, $http, $parse) {
     return {
       restrict: 'A',
@@ -23,6 +25,7 @@
         var onCompletionModel= null;
         var uploadProgressModel= null;
         var uploadingModel= null;
+        
         if($attrs.previewImageSrc)
         {
           previewImageSrcModel= $parse($attrs.previewImageSrc);
@@ -42,7 +45,7 @@
         {
           uploadingModel= $parse($attrs.uploading);
         }
-
+        
         // bind the change handler...
         $element.find('input[type=file]').on('change', function() {
           if($(this).val())
@@ -76,70 +79,61 @@
                   if(window.FileReader)
                   {
                     if (/^image/.test( filetype )){ // only image file
+                      var minWidth= $attrs.minImageWidth || 0;
+                      var minHeight= $attrs.minImageHeight || 0;
+
                       var reader = new FileReader(); // instance of the FileReader
-                      reader.readAsDataURL(files[0]); // read the local file
 
                       reader.onloadend = function() { // set image data as background of div
                         var imageData= this.result;
+                        if(minWidth || minHeight)
+                        {
+                          var img= new Image();
+                          img.onload= function() {
+                            if((minWidth && this.width<minWidth) || (minHeight && this.height<minHeight))
+                            {
+                              var lines= [];
+                              lines.push("This image is too small.");
+                              if(minWidth) {
+                                lines.push("It must be at least "+minWidth+" pixels wide (It is currently "+this.width+")");
+                              }
+                              if(minHeight) {
+                                lines.push("It must be at least "+minHeight+" pixels tall (It is currently "+this.height+")");
+                              }
+                              alert(lines.join("\n"));
+                              resetFileInput();
+                            } else {
+                              $scope.$apply(function(){
+                                // Start the upload
+                                start_upload(filename, filetype);
+                              });
+                            }
+                          };
+                          img.src= imageData;
+                        } 
+
                         $scope.$apply(function(){
                           previewImageSrcModel.assign($scope, imageData);
-                        });
-                      };
-                    } else if($attrs.defaultPreviewImage) {
-                      previewImageSrcModel.assign($scope, $attrs.defaultPreviewImage);
-                    }
-                  }
-
-                  $http.post($attrs.endpointUrl, { 
-                    verb: 'upload-parameters', 
-                    filename: filename, 
-                    id: $attrs.identifier, 
-                    type: $attrs.type,
-                    mimeType: filetype
-                  }).then(function(data) {
-                    if(data.data.success)
-                    {
-                      params= {
-                        postURL: data.data.result['url'],
-                        uploadBucket: data.data.result['bucket'],
-                        uploadParameters: data.data.result['params'],
-                        uploadKey: data.data.result['params']['key'],
-                        mimeType: data.data.result['mimeType']
-                      };
-                  
-                      upload().then(function(data) {
-                        postUploadComplete().then(function(data) {
-                          if(onCompletionModel)
+                          // Start the upload if no minimum size reqirements
+                          if(!minWidth && !minHeight)
                           {
-                            onCompletionModel($scope, 
-                              { 
-                                bucket: data.result['bucket'],
-                                key: data.result['key'],
-                                url: data.result['url']
-                              });
+                            start_upload(filename, filetype);
                           }
-                          resetFileInput();
                         });
-                      }, function(failure) {
-                        switch(failure.reason)
-                        {
-                        case 'loadFailed':
-                          alert("There was an error attempting to upload the file." + failure.evt.response);
-                          break;
-                        case 'error':
-                          alert("There was an error attempting to upload the file." + failure.evt.response);
-                          break;
-                        case 'aborted':
-                          alert("The upload has been canceled by the user or the browser dropped the connection.");
-                          break;
-                        }
-                        resetFileInput();
-                      });
-                    } else {
-                      alert(data.data.message);
-                      resetFileInput();
+                      };
+
+                      reader.readAsDataURL(files[0]); // read the local file
+                    } else if($attrs.defaultPreviewImage) {
+                      // not image type, assign default if required
+                      previewImageSrcModel.assign($scope, $attrs.defaultPreviewImage);
+                      
+                      // Start the upload
+                      start_upload(filename, filetype);
                     }
-                  });
+                  } else {
+                    // old browser; likely won't work anyway, but...
+                    start_upload(filename, filetype);
+                  }
                 } else {
                   var errorMsg= "Invalid file type!";
                   if(acceptParts.length)
@@ -189,6 +183,62 @@
                 reject();
               }
             }, reject);
+          });
+        }
+        
+        function start_upload(filename, filetype) 
+        {
+          $http.post($attrs.endpointUrl, { 
+            verb: 'upload-parameters', 
+            filename: filename, 
+            id: $attrs.identifier, 
+            type: $attrs.type,
+            mimeType: filetype
+          }).then(function(data) {
+            if(data.data.success)
+            {
+              params= {
+                postURL: data.data.result['url'],
+                uploadBucket: data.data.result['bucket'],
+                uploadParameters: data.data.result['params'],
+                uploadKey: data.data.result['params']['key'],
+                mimeType: data.data.result['mimeType']
+              };
+          
+              upload().then(function(data) {
+                postUploadComplete().then(function(data) {
+                  if(onCompletionModel)
+                  {
+                    onCompletionModel($scope, 
+                      { 
+                        bucket: data.result['bucket'],
+                        key: data.result['key'],
+                        url: data.result['url']
+                      });
+                  }
+                  resetFileInput();
+                }, function(error) {
+                  resetFileInput();
+                });
+              }, function(failure) {
+                switch(failure.reason)
+                {
+                case 'loadFailed':
+                  alert("There was an error attempting to upload the file." + failure.evt.response);
+                  break;
+                case 'error':
+                  alert("There was an error attempting to upload the file." + failure.evt.response);
+                  break;
+                case 'aborted':
+                  alert("The upload has been canceled by the user or the browser dropped the connection.");
+                  break;
+                }
+                resetFileInput();
+              });
+            } else {
+              alert(data.data.message);
+              resetFileInput();
+            }
           });
         }
         
@@ -303,7 +353,9 @@
         identifier: '@', // identifier (passed to endpointURL for configuration)
         endpointUrl: '@', // endpoint URL (called with JSON body, POST, verb: upload-parameters, upload-complete)
         previewImageSrc: '=?', // if set, and upload is type image, will load it here from local (prior to upload)
-        onCompletion: '&?' // called on completion:  on-completion="imageUploaded(url)", url is the newly uploaded url.
+        onCompletion: '&?', // called on completion:  on-completion="imageUploaded(url)", url is the newly uploaded url.
+        minImageWidth: '@?', // if type is image, won't upload if less than this width
+        minImageHeight: '@?', // if type is image, won't upload if less than this height
       },
       template:
         '<div>'+
@@ -318,6 +370,8 @@
             'on-completion="complete(bucket, key, url)" '+
             'upload-progress="state.progress" '+
             'uploading="state.uploading" '+
+            'min-image-width="{{ minImageWidth }}" '+
+            'min-image-height="{{ minImageHeight }}" '+
             '>{{ title }}</span>'+
         '</div>',
       link: function($scope, $element, $attrs) {
