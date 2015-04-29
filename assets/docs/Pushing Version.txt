@@ -1,7 +1,7 @@
 To push a new version, you would use:
 
-git tag -a v0.0.15 -m "Facebook button redux, mvEnter, and CC # formatting"
-git push origin v0.0.15
+git tag -a v0.0.16 -m "Upload button minImageHeight, minImageWidth; fixed issue with form not resetting in case of error"
+git push origin v0.0.16
 
 To list the current tags:
 
