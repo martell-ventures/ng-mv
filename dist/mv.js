@@ -871,15 +871,22 @@
 				// only valid is digits and space bar.
 				function parseUSZip(inputValue)
 				{
-					if (inputValue) {
-						var digits = inputValue.replace(/[^0-9 \-]/g, '');
-						if (digits !== inputValue) {
-							ngModel.$setViewValue(digits);
-							ngModel.$render();
+					if($scope.countryCode=='US')
+					{
+						if (inputValue) 
+						{
+							var digits = inputValue.replace(/[^0-9 \-]/g, '');
+							if (digits !== inputValue) {
+								ngModel.$setViewValue(digits);
+								ngModel.$render();
+							}
+							return digits;
 						}
-						return digits;
+						return undefined;
+					} else {
+						debugger;
+						return inputValue;
 					}
-					return undefined;
 				}
 				
 				function validUSZip(modelValue, viewValue) 

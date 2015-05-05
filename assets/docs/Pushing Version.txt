@@ -1,7 +1,7 @@
 To push a new version, you would use:
 
-git tag -a v0.0.16 -m "Upload button minImageHeight, minImageWidth; fixed issue with form not resetting in case of error"
-git push origin v0.0.16
+git tag -a v0.0.17 -m "Zip code field allows non-numeric for non US zips."
+git push origin v0.0.17
 
 To list the current tags:
 
