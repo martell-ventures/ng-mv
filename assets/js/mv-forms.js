@@ -100,7 +100,7 @@
 
 	// NOTE: this is definitely different than before.
 	// update addressItem through a mapping table, ideally.
-	app.directive('mvAddress', ['$http', '$mvConfiguration', function($http, $mvConfiguration) {
+	app.directive('mvAddress', ['$http', '$mvConfiguration', '$parse', function($http, $mvConfiguration, $parse) {
 		return {
 			restrict: 'E',
 			templateUrl: function(tElement, tAttrs) {
@@ -123,6 +123,8 @@
 				country: "=", // country code now ISO, not country record.
 				requiredFields: "=",
 				useStreet2: "=?", //optional, set to true if you want to use street address line 2 field
+				fieldChanged: '&?' // optional, takes field, 
+				// fieldChanged: '&?' // optional fieldChanged
 			},
 			link: function($scope, $element, $attrs) {
 				var lastSelectedState= {};
@@ -167,6 +169,26 @@
 						}
 					}
 				});
+				
+				$scope.sendChange= function(fieldName, newValue, oldValue) {
+					if($scope.fieldChanged) {
+						$scope.fieldChanged({ 
+							field: $attrs[fieldName], // passed back up as the binding name.
+							newValue: newValue,
+							oldValue: oldValue
+						});
+					}
+/*
+					if(onChangedField)
+					{
+						onChangedField($scope, { 
+							field: fieldName,
+							newValue: newValue,
+							oldValue: oldValue
+						});
+					}
+*/
+				};
 				
 				// this is for the case where you change the model value directly.
 				$scope.$watch('country', function(newValue) {

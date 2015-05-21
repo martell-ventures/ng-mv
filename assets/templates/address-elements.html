@@ -1,28 +1,40 @@
 <div class="form-group">
 	<label>Country</label>
-	<select class="form-control" ng-model="countryObject" ng-options="c.Name for c in countries"></select>
+	<select class="form-control" ng-model="countryObject" ng-options="c.Name for c in countries" ng-change="sendChange('country', countryObject.Code, '{{ countryObject.Code }}')"></select>
 </div>
 <div class="form-group">
 	<label>Street</label>
-	<input class="form-control" type="text" ng-model="street" placeholder="1010 Main Street" show-validation-icon ng-required="requiredFields['street']"></input>
+	<input class="form-control" type="text" ng-model="street" placeholder="1010 Main Street" show-validation-icon ng-required="requiredFields['street']" 
+		ng-change="sendChange('street', street, '{{ street }}')">
+	</input>
 </div>
 <div class="form-group" ng-show='useStreet2'>
 	<label>Street Line 2</label>
-	<input class="form-control" type="text" ng-model="street2" placeholder="Apt #12" show-validation-icon ng-required="requiredFields['street2']"></input>
+	<input class="form-control" type="text" ng-model="street2" placeholder="Apt #12" show-validation-icon ng-required="requiredFields['street2']"
+		ng-change="sendChange('street2', street2, '{{ street2 }}')">
+	</input>
 </div>
 <div class="form-group">
 	<label>City</label>
-	<input class="form-control" type="text" ng-model="city" placeholder="City" show-validation-icon ng-required="requiredFields['city']"></input>
+	<input class="form-control" type="text" ng-model="city" placeholder="City" show-validation-icon ng-required="requiredFields['city']"
+		ng-change="sendChange('city', city, '{{ city }}')">
+	</input>
 </div>
 <div class="form-group" ng-show="countryObject.States">
 	<label>{{ countryObject.StateLabel || 'State/Province/Region' }}</label>
-	<select class="form-control" ng-model="state" show-validation-icon ng-options="s.Abbreviation as s.Name for s in countryObject.States" ng-required="stateRequired()"></select>
+	<select class="form-control" ng-model="state" show-validation-icon ng-options="s.Abbreviation as s.Name for s in countryObject.States" ng-required="stateRequired()"
+		ng-change="sendChange('state', state, '{{ state }}')">
+	</select>
 </div>
 <div class="form-group" ng-hide="countryObject.States">
 	<label>{{ countryObject.StateLabel || 'State/Province/Region' }}</label>
-	<input class="form-control" type="text" ng-model="state" show-validation-icon ng-required="stateRequired()"></input>
+	<input class="form-control" type="text" ng-model="state" show-validation-icon ng-required="stateRequired()" 
+		ng-change="sendChange('state', state, '{{ state }}')">
+	</input>
 </div>
 <div class="form-group">
 	<label>{{ countryObject.PostalLabel || 'Postal Code' }}</label>
-	<input class="form-control" type="text" postal-code="country" ng-model="zip" placeholder="Zip" show-validation-icon ng-required="requiredFields['zip']"></input>
+	<input class="form-control" type="text" postal-code="country" ng-model="zip" placeholder="Zip" show-validation-icon ng-required="requiredFields['zip']"
+		ng-change="sendChange('zip', zip, '{{ zip }}')">
+	</input>
 </div>

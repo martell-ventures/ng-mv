@@ -163,7 +163,8 @@
 						zip="address.zip"
 						country="address.country"
 						required-fields="requiredFields"
-						use-street-2="address.useStreet2">
+						use-street-2="address.useStreet2"
+						field-changed="addressFieldChanged(field, newValue, oldValue)">
 					</mv-address>
 					<a class="btn btn-primary" ng-disabled="addressForm.$invalid">Submit</a>
 					<div class="checkbox">
@@ -250,6 +251,10 @@
 		
 		$scope.mvEnterExample= function() {
 			$scope.enterExample.message= $sce.trustAsHtml('Enter was pressed!'); 
+		};
+		
+		$scope.addressFieldChanged= function(field, newValue, oldValue) {
+			window.console.log("Field "+field+" Chnaged from: "+oldValue+" to "+newValue);
 		};
 		
 		$scope.facebookResult= function(status, response) {
