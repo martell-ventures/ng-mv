@@ -680,11 +680,30 @@
 	var module = angular.module('mv.facebook', []);
 
   module.provider('$mvFacebookConfiguration', function() {
+    function facebookScriptURL(debug, language) {
+      if(language===undefined) {
+        language= 'en_US';
+      }
+      if(debug===undefined) {
+        debug= false;
+      }
+
+      var url= '//connect.facebook.net/'+language+'/';
+      url+= debug ? 'all/debug.js' : 'all.js';
+      
+      return url;
+    }
+    
     var $mvFacebookConfiguration= {
       options: {
         applicationID: '',
         redirectURL: '',
+        language: 'en_US',
+        debug: false,
         facebookScriptURL: '//connect.facebook.net/en_US/all.js'
+      },
+      setDebugMode: function(debug) {
+        this.options.debug= debug;
       },
       setApplicationID: function(id) {
         this.options.applicationID= id;
@@ -692,11 +711,15 @@
       setRedirectURL: function(url) {
         this.options.redirectURL= url;
       },
+      setLanguage: function(language) {
+        this.options.language= language;
+      },
       $get: ['$injector', function($injector) {
         var config= {
           applicationID: this.options.applicationID,
           redirectURL: this.options.redirectURL,
-          facebookScriptURL: this.options.facebookScriptURL
+          facebookScriptURL: facebookScriptURL(this.options.debug, this.options.language),
+          scriptDOMElementID: 'facebook-sdk-script'
         };
         
         return config;
@@ -712,10 +735,14 @@
 
       // Load Facebook stuff
       function loadScript() {  
+        if (!document.getElementById($mvFacebookConfiguration.scriptDOMElementID))
+        {
           // Use global document since Angular's $document is weak
           var script = document.createElement('script');
+          script.id= $mvFacebookConfiguration.scriptDOMElementID;
           script.src = $mvFacebookConfiguration.facebookScriptURL; // '//connect.facebook.net/en_US/all.js';
           document.body.appendChild(script);
+        }
       }
 
       // called when the script is loaded.
@@ -779,7 +806,7 @@
   //   "status": "success"
   // }
   // Facebook login Button
-  // A, requires facebook-callback
+  // A, requires facebookLoginButton
   module.directive('facebookLoginButton', ['loadFacebookJavascript', '$timeout', '$parse', function( loadFacebookJavascript, $timeout, $parse ) {  
     return {
       restrict: 'A', // restrict by class name
@@ -821,6 +848,104 @@
       }
     };
   }]);
+
+
+  // Facebook login Button
+  // A, 
+  // facebookPostButton is required; you'd likely want it, as it will be called back with the login result if they had to login.
+  //   Called back with status, and the response object
+  // loginCallback is optional; you'd likely want it, as it will be called back IF the user logged in for this event.
+  //   Called back with the same parameters as the facebookLoginButton above.
+  // shareLink: @ - link to share
+  // shareImage: @ - URL to share
+  // shareName: @ - Name to share
+  // shareDescription: @ - Description to share
+  module.directive('facebookPostButton', ['loadFacebookJavascript', '$timeout', '$parse', function( loadFacebookJavascript, $timeout, $parse ) {  
+    return {
+      restrict: 'A', // restrict by class name
+      link: function( $scope, $element, $attrs ) {
+        if(!$attrs.facebookPostButton) {
+          throw new Error('You must supply a facebook callback');
+        }
+        
+        var expressionHandler = $parse($attrs.facebookPostButton);
+        var loginExpressionHandler = null;
+        
+        if($attrs.loginCallback) {
+          loginExpressionHandler= $parse($attrs.loginCallback);
+        }
+        
+        function performPost() {
+          FB.ui(
+            {
+              method: 'feed', 
+              link: $attrs.shareLink, 
+              picture: $attrs.shareImage, 
+              name: $attrs.shareName, 
+              description: $attrs.shareDescription
+            }, 
+            function(postResponse) {
+              $timeout(function() {
+                if(postResponse)
+                {
+                  expressionHandler($scope, {status: 'success', response: postResponse});
+                } else {
+                  expressionHandler($scope, {status: 'cancelled', response: postResponse});
+                }
+              }, 50);
+            }
+          );
+        }
+        
+        function updateApplicationForLogin() {
+          if(loginExpressionHandler) {
+            FB.api('/me', function(response) {
+              $timeout(function() {
+                loginExpressionHandler($scope, {status: 'success', response: response});
+              }, 50);
+            });
+          }
+        }
+        
+        // load the facebook javascript...
+        loadFacebookJavascript.then(
+          function() {
+            // success!
+            $element.on('click', function() {
+              // this is cached; so it's okay to do this in the click handler
+              FB.getLoginStatus(function(statusResponse) {
+                if(statusResponse.status=='connected')
+                {
+                  performPost();
+                } else {
+                  FB.login(function(response) {
+                    if(response.authResponse) {
+                      // perform the post.
+                      performPost();
+                    
+                      // if they weren't logged in before, they just logged in to post; let the app know about it.
+                      updateApplicationForLogin();
+                    } else {
+                      $timeout(function() {
+                        expressionHandler($scope, {status: 'cancelled', response: response});
+                      }, 50);
+                    }
+                  }, {scope: 'email'});  
+                }
+              });
+            });
+          }, 
+          function() {
+            // rejected
+            expressionHandler($scope, {status: 'loadingError', response: { }});
+          }
+        );
+      }
+    };
+  }]);
+
+	
+	
 
 })();
 (function() {

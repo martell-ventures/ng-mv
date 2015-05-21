@@ -1,7 +1,7 @@
 To push a new version, you would use:
 
-git tag -a v0.0.19 -m "19 - Added optional callback for address field changes (vs. watching). (18 was problematic)"
-git push origin v0.0.19
+git tag -a v0.0.20 -m "Added facebook-post-button."
+git push origin v0.0.20
 
 Be sure to change teh version in bower.json!
 

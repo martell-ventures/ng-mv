@@ -18,7 +18,25 @@
 					<div class="form-group">
 						<label>Facebook Login</label>
 						<a class="btn btn-primary btn-block" facebook-login-button="facebookResult(status, response)">Login with Facebook</a>
-						<div class="help-block" ng-show="facebook.response">
+						<div class="help-block" ng-show="facebook.hasData">
+							Result
+							<pre>{{ facebook | json }}</pre>
+						</div>
+
+						<label>Facebook Post</label>
+						<a class="btn btn-primary btn-block" 
+							facebook-post-button="facebookPostResult(status, response)" 
+							login-callback="facebookResult(status, response)"
+						    // shareLink: @ - link to share
+						    // shareImage: @ - URL to share
+						    // shareName: @ - Name to share
+						    // shareDescription: @ - Description to share
+							share-link="http://www.martellventures.com"
+							share-name="Martell Ventures, LLC"
+							share-description="Example description for sharing...."
+						>
+							Post to Facebook</a>
+						<div class="help-block" ng-show="facebook.hasData">
 							Result
 							<pre>{{ facebook | json }}</pre>
 						</div>
@@ -240,7 +258,11 @@
 	
 	app.controller("TestController", ['$scope', '$modal', '$sce', function($scope, $modal, $sce) {
 		$scope.facebook= {
-			response: undefined
+			hasData: false,
+			loginStatus: undefined,
+			loginResponse: undefined,
+			postResponse: undefined,
+			postStatus: undefined
 		};
 		
 		$scope.testFlashAlert= function() {
@@ -257,9 +279,37 @@
 			window.console.log("Field "+field+" Chnaged from: "+oldValue+" to "+newValue);
 		};
 		
+		$scope.facebookPostResult= function(status, response) {
+			$scope.facebook.hasData= true;
+			$scope.facebook.postStatus= status;
+			$scope.facebook.postResponse= response;
+
+			switch(status)
+			{
+			case 'cancelled': // user cancelled login. (more info in response)
+				break;
+			case 'success': // logged in succesfully. (full info in response)
+				// "response": {
+				//     "id": "1015272938234234",
+				//     "email": "email@domain.com",
+				//     "first_name": "FirstName",
+				//     "gender": "male",
+				//     "last_name": "LastName",
+				//     "link": "https://www.facebook.com/app_scoped_user_id/1015272938234234/",
+				//     "locale": "en_US",
+				//     "name": "FirstName LastName",
+				//     "timezone": -4,
+				//     "updated_time": "2014-08-11T19:12:29+0000",
+				//     "verified": true
+				//   },
+				break;
+			}
+		}
+		
 		$scope.facebookResult= function(status, response) {
-			$scope.facebook.status= status;
-			$scope.facebook.response= response;
+			$scope.facebook.hasData= true;
+			$scope.facebook.loginStatus= status;
+			$scope.facebook.loginResponse= response;
 
 			switch(status)
 			{
