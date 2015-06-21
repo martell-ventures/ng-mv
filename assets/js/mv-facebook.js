@@ -23,7 +23,11 @@
         redirectURL: '',
         language: 'en_US',
         debug: false,
-        facebookScriptURL: '//connect.facebook.net/en_US/all.js'
+        facebookScriptURL: '//connect.facebook.net/en_US/all.js',
+        scope: 'email'
+      },
+      setLoginRequiredScope: function(scope) {
+        this.options.scope= scope;
       },
       setDebugMode: function(debug) {
         this.options.debug= debug;
@@ -42,7 +46,8 @@
           applicationID: this.options.applicationID,
           redirectURL: this.options.redirectURL,
           facebookScriptURL: facebookScriptURL(this.options.debug, this.options.language),
-          scriptDOMElementID: 'facebook-sdk-script'
+          scriptDOMElementID: 'facebook-sdk-script',
+          scope: this.options.scope
         };
         
         return config;
@@ -130,7 +135,7 @@
   // }
   // Facebook login Button
   // A, requires facebookLoginButton
-  module.directive('facebookLoginButton', ['loadFacebookJavascript', '$timeout', '$parse', function( loadFacebookJavascript, $timeout, $parse ) {  
+  module.directive('facebookLoginButton', ['loadFacebookJavascript', '$timeout', '$parse', '$mvFacebookConfiguration', function( loadFacebookJavascript, $timeout, $parse, $mvFacebookConfiguration ) {
     return {
       restrict: 'A', // restrict by class name
       link: function( $scope, $element, $attrs ) {
@@ -160,7 +165,7 @@
                     expressionHandler($scope, {status: 'cancelled', response: response});
                   }, 50);
                 }
-              }, {scope: 'email'});  
+              }, {scope: $mvFacebookConfiguration.scope, auth_type:'rerequest'});
             });
           }, 
           function() {

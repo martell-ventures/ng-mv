@@ -254,15 +254,17 @@
 	app.config(['$mvFacebookConfigurationProvider', function(mvFacebookConfig) {
 		mvFacebookConfig.setApplicationID('1624852824413556'); // mv stuff.
 		mvFacebookConfig.setRedirectURL('http://ng-mv.local');
+		mvFacebookConfig.setLoginRequiredScope('email,user_friends');
 	}]);
 	
-	app.controller("TestController", ['$scope', '$modal', '$sce', function($scope, $modal, $sce) {
+	app.controller("TestController", ['$scope', '$modal', '$sce', '$window', function($scope, $modal, $sce, $window) {
 		$scope.facebook= {
 			hasData: false,
 			loginStatus: undefined,
 			loginResponse: undefined,
 			postResponse: undefined,
-			postStatus: undefined
+			postStatus: undefined,
+			permissions: undefined
 		};
 		
 		$scope.testFlashAlert= function() {
@@ -331,6 +333,13 @@
 				//     "updated_time": "2014-08-11T19:12:29+0000",
 				//     "verified": true
 				//   },
+				//now get the granted permissions
+				window.FB.api('/me/permissions', function(response) {
+				  //we need to $apply because this happens outside of angular's cycle
+				  $scope.$apply(function()  {
+				      $scope.facebook.permissions = response.data;
+				  });
+				});
 				break;
 			}
 		};
