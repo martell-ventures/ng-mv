@@ -1,9 +1,9 @@
 To push a new version, you would use:
 
-git tag -a v0.0.20 -m "Added facebook-post-button."
-git push origin v0.0.20
+git tag -a v0.0.21 -m "Ability to request additional permissions on Facebook login."
+git push origin v0.0.21
 
-Be sure to change teh version in bower.json!
+Be sure to change the version in bower.json!
 
 To list the current tags:
 
