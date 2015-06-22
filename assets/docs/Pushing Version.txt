@@ -11,3 +11,5 @@ Be sure to change the version in bower.json!
 To list the current tags:
 
 git tag -l
+
+This line is here only for testing.  Remove later.
