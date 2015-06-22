@@ -1,12 +1,12 @@
 To push a new version, you would use:
 
-git tag -a v0.0.21 -m "Ability to request additional permissions on Facebook login."
-git push origin v0.0.21
+Change the version in bower.json to the new version
+
+git tag -a v0.0.22 -m "Added missing Canadian Provinces and Territories to country.json"
+git push origin v0.0.22
 
 Then:
 git push
-
-Be sure to change the version in bower.json!
 
 To list the current tags:
 
