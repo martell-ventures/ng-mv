@@ -33,7 +33,6 @@
 						}
 						return undefined;
 					} else {
-						debugger;
 						return inputValue;
 					}
 				}
