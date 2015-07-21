@@ -11,5 +11,3 @@ git push
 To list the current tags:
 
 git tag -l
-
-This line is here only for testing.  Remove later.
