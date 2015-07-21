@@ -129,6 +129,9 @@
                       
                       // Start the upload
                       start_upload(filename, filetype);
+                    } else {
+                      //not an image and default preview image also not specified, so just upload it
+                      start_upload(filename, filetype);
                     }
                   } else {
                     // old browser; likely won't work anyway, but...
