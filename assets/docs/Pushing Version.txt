@@ -2,8 +2,8 @@ To push a new version, you would use:
 
 Change the version in bower.json to the new version
 
-git tag -a v0.0.23 -m "Rmeoving annoying debugger call"
-git push origin v0.0.23
+git tag -a v0.0.24 -m "Fix file uploading when default preview image not specified"
+git push origin v0.0.24
 
 Then:
 git push
@@ -11,5 +11,3 @@ git push
 To list the current tags:
 
 git tag -l
-
-This line is here only for testing.  Remove later.
