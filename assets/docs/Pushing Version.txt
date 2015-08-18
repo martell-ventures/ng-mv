@@ -2,8 +2,8 @@ To push a new version, you would use:
 
 Change the version in bower.json to the new version
 
-git tag -a v0.0.24 -m "Fix file uploading when default preview image not specified"
-git push origin v0.0.24
+git tag -a v0.0.25 -m "Added mv-upload-button.less"
+git push origin v0.0.25
 
 Then:
 git push
