@@ -235,12 +235,13 @@
                 postUploadComplete().then(function(data) {
                   if(onCompletionModel)
                   {
-                    onCompletionModel($scope, 
-                      { 
-                        bucket: data.result['bucket'],
-                        key: data.result['key'],
-                        url: data.result['url']
-                      });
+                    // pass to the completion model everything we get back from the server on completion.
+                    onCompletionModel($scope, data.result);
+                      // {
+                      //   bucket: data.result['bucket'],
+                      //   key: data.result['key'],
+                      //   url: data.result['url']
+                      // });
                   }
                   resetFileInput();
                 }, function(error) {
