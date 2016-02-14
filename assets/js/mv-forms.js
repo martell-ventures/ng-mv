@@ -122,8 +122,10 @@
 				country: "=", // country code now ISO, not country record.
 				requiredFields: "=",
 				useStreet2: "=?", //optional, set to true if you want to use street address line 2 field
-				fieldChanged: '&?' // optional, takes field, 
+				fieldChanged: '&?', // optional, takes field, 
+				filterCountries: '&?', // optional, returns true if country is acceptable.
 				// fieldChanged: '&?' // optional fieldChanged
+				// filterCountries: method name- calls with country, returns true or false if the country should be used.
 			},
 			link: function($scope, $element, $attrs) {
 				var lastSelectedState= {};
@@ -245,28 +247,52 @@
 				}
 
 				// load the countries
-				$http.get($mvConfiguration.templateBasePath+'countries.json').success(function(data) {
-					$scope.countries= data;
-					if($scope.country===undefined)
-					{
-						$scope.country= 'US';
-					}
-					
-					// now find the original one and update the state and the country object appropriately.
-					angular.forEach($scope.countries, function(country) {
-						if(country.Code==$scope.country)
+				function loadCountries() {
+					$http.get($mvConfiguration.templateBasePath+'countries.json').success(function(data) {
+						// allow us to filter countries
+						if($attrs.filterCountries)
 						{
-							$scope.countryObject= country;
-							if(country.States)
-							{
-								var selected= MatchToNameOrAbbreviation($scope.state, country.States);
-								if(selected)
+							var filtered= [];
+							angular.forEach(data, function(country) {
+								if($scope.filterCountries({ country: country }))
 								{
-									$scope.state= selected.Abbreviation;
+									filtered.push(country);
+								}
+							});
+							$scope.countries= filtered;
+						} else {
+							$scope.countries= data;
+						}
+					
+						if($scope.country===undefined)
+						{
+							$scope.country= 'US';
+						}
+					
+						// now find the original one and update the state and the country object appropriately.
+						angular.forEach($scope.countries, function(country) {
+							if(country.Code==$scope.country)
+							{
+								$scope.countryObject= country;
+								if(country.States)
+								{
+									var selected= MatchToNameOrAbbreviation($scope.state, country.States);
+									if(selected)
+									{
+										$scope.state= selected.Abbreviation;
+									}
 								}
 							}
-						}
+						});
 					});
+				}
+
+				// initial load
+				loadCountries();
+			
+				// mainly for testing country filtering.
+				$scope.$on('mv-reload-countries', function() {
+					loadCountries();
 				});
 			}
 		};

@@ -161,6 +161,9 @@
 							<div class="checkbox">
 								<label><input type="checkbox" ng-model="requiredFields.country"></input> Require Country</label>
 							</div>
+							<div class="checkbox">
+								<label><input type="checkbox" ng-model="filterToOnlyStripeAvailableCountries" ng-change="changeCountryFilter()"></input> Filter Countries (Stripe Only)</label>
+							</div>
 						</div>
 					</div>
 					<div class="form-group">
@@ -182,7 +185,8 @@
 						country="address.country"
 						required-fields="requiredFields"
 						use-street-2="address.useStreet2"
-						field-changed="addressFieldChanged(field, newValue, oldValue)">
+						field-changed="addressFieldChanged(field, newValue, oldValue)"
+						filter-countries="filterCountry(country)">
 					</mv-address>
 					<a class="btn btn-primary" ng-disabled="addressForm.$invalid">Submit</a>
 					<div class="checkbox">
@@ -343,6 +347,32 @@
 				break;
 			}
 		};
+		
+		$scope.filterToOnlyStripeAvailableCountries= false;
+		$scope.changeCountryFilter= function() {
+			$scope.$broadcast('mv-reload-countries');
+		};
+		
+		$scope.filterCountry= function(country) {
+			var valid= true;
+			if($scope.filterToOnlyStripeAvailableCountries)
+			{
+				switch(country.Code) {
+				case 'US':
+				case 'GB':
+				case 'CA':
+				case 'AU':
+					valid= true;
+					break;
+				default:
+					valid= false;
+					break;
+				}
+			} else {
+				valid= true;
+			}
+			return valid;
+		}
 		
 		$scope.showAddressDialog= function(which) {
 			var modalInstance= $modal.open({
