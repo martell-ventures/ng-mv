@@ -1231,6 +1231,7 @@
 				function loadCountries() {
 					$http.get($mvConfiguration.templateBasePath+'countries.json').success(function(data) {
 						// allow us to filter countries
+						var currentCountryFound= false;
 						if($attrs.filterCountries)
 						{
 							var filtered= [];
@@ -1245,9 +1246,34 @@
 							$scope.countries= data;
 						}
 					
-						if($scope.country===undefined)
+						var countryFound= false, hasUS= false;
+						angular.forEach($scope.countries, function(country) {
+							if(country.Code=='US')
+							{
+								hasUS= true;
+							}
+							// if country is undefined, this will NOT be found.
+							if($scope.country==country.Code)
+							{
+								countryFound= true;
+							}
+						});
+					
+						// set a sane default.
+						if(!countryFound) // not found, or was set to undefined.
 						{
-							$scope.country= 'US';
+							if($attrs.defaultCountryCode)
+							{
+								$scope.country= $attrs.defaultCountryCode;
+							} else {
+								if(hasUS)
+								{
+									$scope.country= 'US';
+								} else {
+									// filtered; take whatever is first (allow default later?)
+									$scope.country= $scope.countries[0].Code;
+								}
+							}
 						}
 					
 						// now find the original one and update the state and the country object appropriately.
