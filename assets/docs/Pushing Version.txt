@@ -2,8 +2,8 @@ To push a new version, you would use:
 
 Change the version in bower.json to the new version
 
-git tag -a v0.0.29 -m "mv-address now has optional ng-disabled tracking, so you can disable the address (ie make it read-only)"
-git push origin v0.0.29
+git tag -a v0.0.30 -m "mv-address removed extra debugger call."
+git push origin v0.0.30
 
 Then:
 git push
