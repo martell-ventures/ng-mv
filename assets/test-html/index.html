@@ -148,6 +148,9 @@
 							<div class="checkbox">
 								<label><input type="checkbox" ng-model="requiredFields.city"></input> Require City</label>
 							</div>
+							<div class="checkbox">
+								<label><input type="checkbox" ng-model="disableAddress"></input> Disable Address</label>
+							</div>
 						</div>
 						<div class="col-md-4">
 							<div class="checkbox">
@@ -186,7 +189,8 @@
 						required-fields="requiredFields"
 						use-street-2="address.useStreet2"
 						field-changed="addressFieldChanged(field, newValue, oldValue)"
-						filter-countries="filterCountry(country)">
+						filter-countries="filterCountry(country)"
+						ng-disabled="disableAddress">
 					</mv-address>
 					<a class="btn btn-primary" ng-disabled="addressForm.$invalid">Submit</a>
 					<div class="checkbox">

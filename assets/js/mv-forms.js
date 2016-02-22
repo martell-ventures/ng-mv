@@ -130,6 +130,16 @@
 			link: function($scope, $element, $attrs) {
 				var lastSelectedState= {};
 				$scope.countries= [];
+				$scope.disabled= false;
+
+				// allow for disabling of the mvAddress, for effectively "locking" it.
+				if($attrs.ngDisabled !== undefined)
+				{
+					$scope.$parent.$watch($attrs.ngDisabled, function(newValue) {
+						debugger;
+						$scope.disabled= newValue;
+					});
+				}
 
 					// fill in sane values; note that the country is set below.
 				// FIXME: I'd like to remove this, but unsure if I can safely based on other places that might expect these to have fields.
