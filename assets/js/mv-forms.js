@@ -136,7 +136,6 @@
 				if($attrs.ngDisabled !== undefined)
 				{
 					$scope.$parent.$watch($attrs.ngDisabled, function(newValue) {
-						debugger;
 						$scope.disabled= newValue;
 					});
 				}
