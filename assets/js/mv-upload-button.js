@@ -192,6 +192,13 @@
           e.unwrap();
         }
         
+        function setUploading(uploading) {
+          if(uploadingModel)
+          {
+            uploadingModel.assign($scope, uploading);
+          }
+        }
+        
         function postUploadComplete() {
           return $q(function(resolve, reject) {
             $http.post($attrs.endpointUrl, { 
@@ -231,6 +238,7 @@
                 mimeType: data.data.result['mimeType']
               };
           
+              setUploading(true);
               upload().then(function(data) {
                 postUploadComplete().then(function(data) {
                   if(onCompletionModel)
@@ -243,8 +251,10 @@
                       //   url: data.result['url']
                       // });
                   }
+                  setUploading(false);
                   resetFileInput();
                 }, function(error) {
+                  setUploading(false);
                   resetFileInput();
                 });
               }, function(failure) {
@@ -260,6 +270,7 @@
                   alert("The upload has been canceled by the user or the browser dropped the connection.");
                   break;
                 }
+                setUploading(false);
                 resetFileInput();
               });
             } else {
@@ -310,18 +321,10 @@
               if(xhr && xhr.currentTarget.status==201)
               {
                 $scope.$apply(function() {
-                  if(uploadingModel)
-                  {
-                    uploadingModel.assign($scope, false);
-                  }
                   resolve();
                 });
               } else {
                 $scope.$apply(function() {
-                  if(uploadingModel)
-                  {
-                    uploadingModel.assign($scope, false);
-                  }
                   reject({ reason: 'loadFailed', evt: xhr.currentTarget });
                 });
                   
@@ -331,10 +334,6 @@
           
             xhr.addEventListener("error", function(evt) {
               $scope.$apply(function() {
-                if(uploadingModel)
-                {
-                  uploadingModel.assign($scope, false);
-                }
                 reject({ reason: 'error', evt: evt });
               });
 //alert("There was an error attempting to upload the file." + evt);
@@ -342,19 +341,10 @@
           
             xhr.addEventListener("abort", function(evt) {
               $scope.$apply(function() {
-                if(uploadingModel)
-                {
-                  uploadingModel.assign($scope, false);
-                }
                 reject({ reason: 'aborted' });
               });
 //alert("The upload has been canceled by the user or the browser dropped the connection.");
             }, false);
-
-            if(uploadingModel)
-            {
-              uploadingModel.assign($scope, true);
-            }
 
             // set to 0
             if(uploadProgressModel)
@@ -383,6 +373,7 @@
         onCompletion: '&?', // called on completion:  on-completion="imageUploaded(url)", url is the newly uploaded url.
         minImageWidth: '@?', // if type is image, won't upload if less than this width
         minImageHeight: '@?', // if type is image, won't upload if less than this height
+        uploading: '=?' // if there, shows true/false while uploading.
       },
       template:
         '<div>'+
@@ -413,6 +404,14 @@
             $scope.previewImageSrc= newValue;
           }
         });
+        
+        // uploading is optional attribute
+        if($attrs.uploading)
+        {
+          $scope.$watch('state.uploading', function(newValue) {
+            $scope.uploading= newValue;
+          });
+        }
         
         $scope.complete= function(bucket, key, url) {
           if($scope.onCompletion)
