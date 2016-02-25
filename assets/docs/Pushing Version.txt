@@ -2,8 +2,8 @@ To push a new version, you would use:
 
 Change the version in bower.json to the new version
 
-git tag -a v0.0.31 -m "mv-address added maxlength fields; made upload-button.less more specific."
-git push origin v0.0.31
+git tag -a v0.0.32 -m "mv-upload button tweaks."
+git push origin v0.0.32
 
 Then:
 git push
