@@ -1,6 +1,6 @@
 {
   "name": "ng-mv",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "description": "Martell Ventures Angular Components",
   "main": "./dist/mv.js",
   "authors": [
