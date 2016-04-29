@@ -1080,7 +1080,7 @@
 
 	// NOTE: this is definitely different than before.
 	// update addressItem through a mapping table, ideally.
-	app.directive('mvAddress', ['$http', '$mvConfiguration', function($http, $mvConfiguration) {
+	app.directive('mvAddress', ['$http', '$mvConfiguration', '$timeout', function($http, $mvConfiguration, $timeout) {
 		return {
 			restrict: 'E',
 			templateUrl: function(tElement, tAttrs) {
@@ -1303,8 +1303,12 @@
 					});
 				}
 
-				// initial load
-				loadCountries();
+				//If the country JSON is slow to load, a race condition could occur causing country to not be set properly (specifically on LG)
+				//This timeout seems to keep things in sync
+				$timeout(function() {
+					// initial load
+					loadCountries();
+				});
 			
 				// mainly for testing country filtering.
 				$scope.$on('mv-reload-countries', function() {
