@@ -1080,7 +1080,7 @@
 
 	// NOTE: this is definitely different than before.
 	// update addressItem through a mapping table, ideally.
-	app.directive('mvAddress', ['$http', '$mvConfiguration', '$parse', function($http, $mvConfiguration, $parse) {
+	app.directive('mvAddress', ['$http', '$mvConfiguration', function($http, $mvConfiguration) {
 		return {
 			restrict: 'E',
 			templateUrl: function(tElement, tAttrs) {
