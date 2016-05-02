@@ -2,8 +2,8 @@ To push a new version, you would use:
 
 Change the version in bower.json to the new version
 
-git tag -a v0.0.33 -m "Fix issue with mv-address where a slow loading countries.json might cause problems."
-git push origin v0.0.33
+git tag -a v0.0.36 -m "Fixed an issue in the bower.json file."
+git push origin v0.0.36
 
 Then:
 git push
