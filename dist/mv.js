@@ -1077,10 +1077,57 @@
 			}
 		};
 	});
-
+	
 	// NOTE: this is definitely different than before.
 	// update addressItem through a mapping table, ideally.
-	app.directive('mvAddress', ['$http', '$mvConfiguration', '$timeout', function($http, $mvConfiguration, $timeout) {
+	app.directive('mvAddress', ['$mvConfiguration', '$q', '$http', function($mvConfiguration, $q, $http) {
+		// by putting this out here, it only gets loaded once.
+		var countryLoadDeferred;
+
+		function MatchToNameOrAbbreviation(test, arr) {
+			var selected = null;
+			if(test !== undefined)
+			{
+				var lowerMatch = test.trim().toLowerCase();
+				angular.forEach(arr, function(item) {
+					if(lowerMatch==item.Abbreviation.toLowerCase() || lowerMatch==item.Name.toLowerCase())
+					{
+						selected= item;
+					}
+				});
+			}
+			return selected;
+		}
+		
+		function loadCountriesFromServer() 
+		{
+			if(countryLoadDeferred===undefined)
+			{
+				countryLoadDeferred = $q.defer();
+				
+				var getResult = $http.get($mvConfiguration.templateBasePath+'countries.json');
+				if(getResult.success !== undefined)
+				{
+					getResult.success(function(data) {
+						countryLoadDeferred.resolve(data);
+					});
+					
+					getResult.error(function(failureData) {
+						countryLoadDeferred.reject(failureData);
+					});
+				} else {
+					// modern versions of angular unify this with then.
+					getResult.then(function(data) {
+						countryLoadDeferred.resolve(data);
+					}, function(failureData) {
+						countryLoadDeferred.reject(failureData);
+					});
+				}
+			}
+			
+			return countryLoadDeferred.promise;
+		}
+
 		return {
 			restrict: 'E',
 			templateUrl: function(tElement, tAttrs) {
@@ -1145,22 +1192,6 @@
 					lastSelectedState[$scope.country]= $scope.state;
 				}
 
-				// change country; make sure state updates appropriately
-				$scope.$watch('countryObject', function(newValue) {
-					if(newValue && newValue.Code != $scope.country)
-					{
-						$scope.country= newValue.Code;
-
-						// return to the previous value (if there was one.)
-						if(lastSelectedState[$scope.country])
-						{
-							$scope.state= lastSelectedState[$scope.country];
-						} else {
-							$scope.state= '';
-						}
-					}
-				});
-				
 				$scope.sendChange= function(fieldName, newValue, oldValue) {
 					if($scope.fieldChanged) {
 						$scope.fieldChanged({ 
@@ -1169,35 +1200,63 @@
 							oldValue: oldValue
 						});
 					}
-/*
-					if(onChangedField)
-					{
-						onChangedField($scope, { 
-							field: fieldName,
-							newValue: newValue,
-							oldValue: oldValue
-						});
-					}
-*/
 				};
 				
-				// this is for the case where you change the model value directly.
-				$scope.$watch('country', function(newValue) {
-					if($scope.countryObject && newValue != $scope.countryObject.Code)
+				function syncStateOnCountryChange() {
+					// restore the state.
+					if(lastSelectedState[$scope.country])
+					{
+						$scope.state= lastSelectedState[$scope.country];
+					} else {
+						if($scope.countryObject !== undefined && $scope.countryObject.States)
+						{
+							var selected= MatchToNameOrAbbreviation($scope.state, $scope.countryObject.States);
+							if(selected)
+							{
+								$scope.state= selected.Abbreviation;
+							}
+						} else {
+							$scope.state= '';
+						}
+					}
+				}
+				
+				function syncCountryObjectToCountryCode(countryCode) {
+					// we don't check this, because we do this from both sides.
+					if($scope.countryObject===undefined || countryCode != $scope.countryObject.Code)
 					{
 						var changed= false;
 						angular.forEach($scope.countries, function(item) {
-							if(item.Code==newValue)
+							if(item.Code==countryCode)
 							{
-								window.console.log("Change the country object!");
+								// window.console.log("Change the country object to "+item.Code);
 								$scope.countryObject= item;
 								changed= true;
 							}
 						});
-						
+					
 						if(!changed) {
-							window.console.log("Change the country object; country "+newValue+" NOT FOUND!");
+							window.console.log("Change the country object; country "+countryCode+" NOT FOUND!");
 						}
+					}
+				}
+				
+				// this is for the case where you change the model value directly.
+				$scope.$watch('country', function(newValue) {
+					if(newValue !== undefined)
+					{
+						// window.console.log("Changing country to "+newValue);
+						syncCountryObjectToCountryCode(newValue);
+					}
+				});
+
+				// if you change the select, it changes the countryObject, so here we make sure country stays in sync.
+				$scope.$watch('countryObject.Code', function(newValue) {
+					if(newValue !== undefined && newValue != $scope.country)
+					{
+						// window.console.log("Changing country object to "+newValue);
+						$scope.country = newValue;
+						syncStateOnCountryChange();
 					}
 				});
 				
@@ -1208,39 +1267,27 @@
 				});
 
 				$scope.stateRequired= function() {
-					var req;
+					var req= false;
 					
-					if($scope.country=='US' || $scope.country=='CA')
+					if($scope.countryObject !== undefined)
 					{
-						req= $scope.requiredFields && $scope.requiredFields['state'];
-					} else {
-						// we don't know if these have states or regions, so don't require it.
-						req= false;
+						// if we have a state array on the object, we require it.
+						if($scope.countryObject.States && $scope.countryObject.States.length>0)
+						{
+							req = $scope.requiredFields && $scope.requiredFields['state'];
+						} else {
+							req = false; 
+						}
 					}
-						
+					
 					return req;
 				};
 
-				function MatchToNameOrAbbreviation(test, arr) {
-					var selected = null;
-					if(test !== undefined)
-					{
-						var lowerMatch = test.trim().toLowerCase();
-						angular.forEach(arr, function(item) {
-							if(lowerMatch==item.Abbreviation.toLowerCase() || lowerMatch==item.Name.toLowerCase())
-							{
-								selected= item;
-							}
-						});
-					}
-					return selected;
-				}
-
 				// load the countries
-				function loadCountries() {
-					$http.get($mvConfiguration.templateBasePath+'countries.json').success(function(data) {
+				function loadCountries() 
+				{
+					loadCountriesFromServer().then(function(data) {
 						// allow us to filter countries
-						var currentCountryFound= false;
 						if($attrs.filterCountries)
 						{
 							var filtered= [];
@@ -1283,32 +1330,16 @@
 									$scope.country= $scope.countries[0].Code;
 								}
 							}
+						} else {
+							// setting the country code above would be a change, and would reset it.
+							// this handles the case where we found it; we would have to change country code away and back othewise.
+							syncCountryObjectToCountryCode($scope.country);
 						}
-					
-						// now find the original one and update the state and the country object appropriately.
-						angular.forEach($scope.countries, function(country) {
-							if(country.Code==$scope.country)
-							{
-								$scope.countryObject= country;
-								if(country.States)
-								{
-									var selected= MatchToNameOrAbbreviation($scope.state, country.States);
-									if(selected)
-									{
-										$scope.state= selected.Abbreviation;
-									}
-								}
-							}
-						});
 					});
 				}
 
-				//If the country JSON is slow to load, a race condition could occur causing country to not be set properly (specifically on LG)
-				//This timeout seems to keep things in sync
-				$timeout(function() {
-					// initial load
-					loadCountries();
-				});
+				// initial load
+				loadCountries();
 			
 				// mainly for testing country filtering.
 				$scope.$on('mv-reload-countries', function() {
