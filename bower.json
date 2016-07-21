@@ -1,6 +1,6 @@
 {
   "name": "ng-mv",
-  "version": "0.0.36",
+  "version": "0.0.38",
   "description": "Martell Ventures Angular Components",
   "main": "./dist/mv.js",
   "authors": [
@@ -18,8 +18,8 @@
   ],
   "devDependencies": {
     "bootstrap": "3.3.4",
-    "angular-bootstrap": "0.11.2",
-    "angular-sanitize": "1.3.11"
+    "angular-bootstrap": ">0.14.0",
+    "angular-sanitize": ">1.4.0"
   },
   "dependencies": {
     "angular": ">1.4.0"

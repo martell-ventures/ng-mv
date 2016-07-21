@@ -32,10 +32,10 @@
 		};
 	});
 
-	app.service('Dialogs', ['$modal', '$sce', '$mvConfiguration', function($modal, $sce, $mvConfiguration) {
+	app.service('Dialogs', ['$uibModal', '$sce', '$mvConfiguration', function($uibModal, $sce, $mvConfiguration) {
 		this.Confirm= function(message, title, buttons) {
-			return $modal.open({
-				controller: ['$scope', '$modalInstance', 'message', 'title', 'buttons', function($scope, $modalInstance, message, title, buttons) {
+			return $uibModal.open({
+				controller: ['$scope', '$uibModalInstance', 'message', 'title', 'buttons', function($scope, $uibModalInstance, message, title, buttons) {
 					$scope.message= $sce.trustAsHtml(message);
 					$scope.title= title;
 					$scope.buttons= buttons;
@@ -43,9 +43,9 @@
 					$scope.clickButton= function(button) {
 						if(button.type=='cancel')
 						{
-							$modalInstance.dismiss(button.name);
+							$uibModalInstance.dismiss(button.name);
 						} else {
-							$modalInstance.close(button);
+							$uibModalInstance.close(button);
 						}
 					};
 				}],
@@ -75,8 +75,8 @@
 		};
 		
 		this.SingleTextAreaEntry= function(message, title, buttons) {
-			return $modal.open({
-				controller: ['$scope', '$modalInstance', '$mvConfiguration', 'message', 'title', 'buttons', function($scope, $modalInstance, $mvConfiguration, message, title, buttons) {
+			return $uibModal.open({
+				controller: ['$scope', '$uibModalInstance', '$mvConfiguration', 'message', 'title', 'buttons', function($scope, $uibModalInstance, $mvConfiguration, message, title, buttons) {
 					$scope.message= $sce.trustAsHtml(message);
 					$scope.title= title;
 					$scope.buttons= buttons;
@@ -87,9 +87,9 @@
 					$scope.clickButton= function(button) {
 						if(button.type=='cancel')
 						{
-							$modalInstance.dismiss(button.name);
+							$uibModalInstance.dismiss(button.name);
 						} else {
-							$modalInstance.close({
+							$uibModalInstance.close({
 								button: button,
 								textAreaEntry: $scope.params.textAreaEntry
 							});

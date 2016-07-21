@@ -265,7 +265,7 @@
 		mvFacebookConfig.setLoginRequiredScope('email,user_friends');
 	}]);
 	
-	app.controller("TestController", ['$scope', '$modal', '$sce', '$window', function($scope, $modal, $sce, $window) {
+	app.controller("TestController", ['$scope', '$uibModal', '$sce', '$window', function($scope, $uibModal, $sce, $window) {
 		$scope.facebook= {
 			hasData: false,
 			loginStatus: undefined,
@@ -379,9 +379,9 @@
 		}
 		
 		$scope.showAddressDialog= function(which) {
-			var modalInstance= $modal.open({
+			var modalInstance= $uibModal.open({
 				templateUrl: 'addressDialog.html',
-				controller: ['$scope', '$modalInstance', 'address', function($scope, $modalInstance, address) {
+				controller: ['$scope', '$uibModalInstance', 'address', function($scope, $uibModalInstance, address) {
 					$scope.state= {
 						showJSON: false,
 						requiredFields: {
@@ -395,11 +395,11 @@
 					$scope.address= address;
 					
 					$scope.cancel= function() {
-						$modalInstance.dismiss();
+						$uibModalInstance.dismiss();
 					};
 					
 					$scope.ok= function() {
-						$modalInstance.close($scope.address);
+						$uibModalInstance.close($scope.address);
 					}
 				}],
 				resolve: {
