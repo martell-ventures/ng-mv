@@ -986,6 +986,33 @@
   // myApp.constant('mvTemplateBasePath', 'Greasy Giant');
 	var app = angular.module('mv.forms', ['mv.configuration', 'mv.widgets']);
 
+	// Country loader (so can use in multiple places)
+	// FIXME: Embed countries?
+	app.service('mvCountryLoader', ['$http', '$q', '$mvConfiguration', function($http, $q, $mvConfiguration ) {
+		var countryLoadDeferred = $q.defer();
+	
+		var getResult = $http.get($mvConfiguration.templateBasePath+'countries.json');
+		if(getResult.success !== undefined)
+		{
+			getResult.success(function(data) {
+				countryLoadDeferred.resolve(data);
+			});
+		
+			getResult.error(function(failureData) {
+				countryLoadDeferred.reject(failureData);
+			});
+		} else {
+			// modern versions of angular unify this with then.
+			getResult.then(function(data) {
+				countryLoadDeferred.resolve(data);
+			}, function(failureData) {
+				countryLoadDeferred.reject(failureData);
+			});
+		}
+		
+		return countryLoadDeferred.promise;
+	}]);
+
 	app.directive('postalCode', function() {
 		return {
 			require: '?ngModel',
@@ -1078,11 +1105,13 @@
 		};
 	});
 	
+	
+	
 	// NOTE: this is definitely different than before.
 	// update addressItem through a mapping table, ideally.
-	app.directive('mvAddress', ['$mvConfiguration', '$q', '$http', function($mvConfiguration, $q, $http) {
+	app.directive('mvAddress', ['$mvConfiguration', '$q', '$http', 'mvCountryLoader', function($mvConfiguration, $q, $http, mvCountryLoader) {
 		// by putting this out here, it only gets loaded once.
-		var countryLoadDeferred;
+//		var countryLoadDeferred;
 
 		function MatchToNameOrAbbreviation(test, arr) {
 			var selected = null;
@@ -1098,7 +1127,7 @@
 			}
 			return selected;
 		}
-		
+/*		
 		function loadCountriesFromServer() 
 		{
 			if(countryLoadDeferred===undefined)
@@ -1127,6 +1156,7 @@
 			
 			return countryLoadDeferred.promise;
 		}
+*/
 
 		return {
 			restrict: 'E',
@@ -1286,7 +1316,8 @@
 				// load the countries
 				function loadCountries() 
 				{
-					loadCountriesFromServer().then(function(data) {
+					mvCountryLoader.then(function(data) {
+//					loadCountriesFromServer().then(function(data) {
 						// allow us to filter countries
 						if($attrs.filterCountries)
 						{
