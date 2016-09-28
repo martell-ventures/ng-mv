@@ -176,6 +176,12 @@
 					return; // do nothing if no ng-model
 				}
 				
+				if($element.prop('id')===undefined || $element.prop('id')==='')
+				{
+					// make it conform to safari autofill
+					$element.prop('id', 'cardCsc');
+				}
+				
 				function onlyDigitsParser(inputValue) {
 					if (inputValue) {
 						var digits = inputValue.replace(/[^0-9]/g, '');
@@ -244,6 +250,12 @@
 			link: function($scope, $element, $attrs, ngModel) {
 				if (!ngModel) {
 					return; // do nothing if no ng-model
+				}
+		
+				if($element.prop('id')===undefined || $element.prop('id')==='')
+				{
+					// make it conform to safari autofill
+					$element.prop('id', 'cardNumber');
 				}
 				
 				function digitsAndSpaceParser(inputValue) {
@@ -342,6 +354,12 @@
 					}
 				}
 
+				if($element.prop('id')===undefined || $element.prop('id')==='')
+				{
+					// make it conform to safari autofill
+					$element.prop('id', 'cardExpirationMonth');
+				}
+
 				ngModel.$validators.validExpirationMonth= function(modelValue, viewValue)
 				{
 					var value = modelValue || viewValue;
@@ -400,6 +418,12 @@
 						$element.append(option);
 					}
 				}
+				
+				if($element.prop('id')===undefined || $element.prop('id')==='')
+				{
+					// make it conform to safari autofill
+					$element.prop('id', 'cardExpirationYear');
+				}
 
 				ngModel.$validators.validExpirationYear= function(modelValue, viewValue) {
 					var value = modelValue || viewValue;
@@ -428,28 +452,70 @@
 			}
 		};
 	});
+	
+	module.directive('autofillExpirationFields', function() {
+		var quasiInvisibleStyle = "width: 1px; height: 1px; margin-left: -1000px; position: fixed; display: block;";
+		return {
+			restrict: 'E',
+			scope: {},
+			template: '<input style="'+quasiInvisibleStyle+'" ng-model="afmonth" id="cardExpirationMonth" maxlength="2" ng-change="update()" type="text"><input style="'+quasiInvisibleStyle+'" id="cardExpirationYear" ng-model="afyear" maxlength="4" ng-change="update()" type="text">',
+			link: function($scope, $element, $attr) {
+				$scope.update= function() {
+					$scope.$parent.$emit('autofill-date', { year: $scope.afyear || '', month: $scope.afmonth || ''});
+				};
+			}
+		};
+	});
 
 	// <div class="form-group">
 	// 	<label>Expire</label>
 	// 	<input type="text" class="form-control" placeholder="MM/YY" credit-card-expiration-entry year="expirationYear" year-digits="2" month="expirationMonth" ng-model="monthYear"
 	// 	show-validation-icon ng-required="state.required"></input>
 	// </div>
-	module.directive('creditCardExpirationEntry', function() {
+	module.directive('creditCardExpirationEntry', ['$compile', function($compile) {
 		return {
 			restrict: 'A',
 			require: '?ngModel', 
 			scope: {
 				year: '=',
 				month: '=',
-				yearDigits: '@?'
+				yearDigits: '@?',
+				ngModel: '='
 			},
 			link: function($scope, $element, $attrs, ngModel) {
 				var yearDigits= $attrs.yearDigits ? parseInt($attrs.yearDigits): 2;
 				if(!ngModel) {
 					return;
 				}
+				
+				var linkFn = $compile('<autofill-expiration-fields></autofill-expiration-fields>');
+				var content = linkFn($scope);
+				$element.parent().append(content);
+				
+				$scope.$on('autofill-date', function(evt, params) {
+					if(params.year.length==4 && params.month.length>=1)
+					{
+						var viewValue = '';
+						if(params.month.length==1) {
+							viewValue = '0'+params.month;
+						} else {
+							viewValue = params.month;
+						}
+						viewValue += '/';
+						
+						if(yearDigits==2)
+						{
+							viewValue += params.year.substr(2);
+						} else {
+							viewValue += params.year;
+						}
 
-//		<input type="text" credit-card-expiration-entry year="expirationYear" month="expirationMonth" ng-model="yearMonth"></input>
+						ngModel.$setViewValue(viewValue);
+						ngModel.$render();
+					}
+				});
+				
+
 				function parseExpirationMonthYear(inputValue)
 				{
 					if (inputValue) {
@@ -597,7 +663,7 @@
 				});
 			}
 		};
-	});
+	}]);
 	
   module.directive('creditCardInformation', ['$mvConfiguration', 'creditCards', function($mvConfiguration, creditCards) {
 		return {
