@@ -277,7 +277,32 @@
     };
   }]);
 
-	
-	
+     module.factory('facebookDetails', ['$q', 'loadFacebookJavascript', function ($q, loadFacebookJavascript) {
+               //Need to be logged in before calling this, or it will fail. Not worth setting this up right now to ensure login
+               function getFBPhoto(height, width) {
+                    var deferred = $q.defer();
+                    loadFacebookJavascript.then(function () {
+                         window.FB.api('/me/picture?height=' + height + '&width=' + width + '&redirect=false', function (picResponse) {
+                              if (picResponse && !picResponse.error) {
+                                   if (!picResponse.data.is_silhouette) {
+                                        //only set the profile image if this is not the default FB image.
+                                        deferred.resolve(picResponse.data.url);
+                                   } else {
+                                        deferred.reject('No profile image or only default silhouette available');
+                                   }
+                              } else {
+                                   deferred.reject('Error with API');
+                              }
+                         });
+                    });
+                    return deferred.promise;
+               }
 
+               return {
+                    getPhoto: function (height, width) {
+                         return getFBPhoto(height, width);
+                    }
+               };
+          }
+     ]);
 })();
