@@ -19,9 +19,9 @@
   "devDependencies": {
     "bootstrap": "3.3.4",
     "angular-bootstrap": ">0.14.0",
-    "angular-sanitize": ">1.4.0"
+    "angular-sanitize": "1.5.8"
   },
   "dependencies": {
-    "angular": ">1.4.0"
+    "angular": "1.5.8"
   }
 }
