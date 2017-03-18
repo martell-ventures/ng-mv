@@ -24,7 +24,8 @@
         language: 'en_US',
         debug: false,
         facebookScriptURL: '//connect.facebook.net/en_US/all.js',
-        scope: 'email'
+        scope: 'email',
+        fields: 'email,first_name,last_name,name' //default fields to get from an api call
       },
       setLoginRequiredScope: function(scope) {
         this.options.scope= scope;
@@ -41,13 +42,17 @@
       setLanguage: function(language) {
         this.options.language= language;
       },
+	 setFields: function(fieldString) {
+        this.options.fields= fieldString;
+      },
       $get: ['$injector', function($injector) {
         var config= {
           applicationID: this.options.applicationID,
           redirectURL: this.options.redirectURL,
           facebookScriptURL: facebookScriptURL(this.options.debug, this.options.language),
           scriptDOMElementID: 'facebook-sdk-script',
-          scope: this.options.scope
+          scope: this.options.scope,
+          fields: this.options.fields
         };
         
         return config;
@@ -152,7 +157,7 @@
             $element.on('click', function() {
               FB.login(function(response) {
                 if (response.authResponse) {
-                  FB.api('/me', function(response) {
+                  FB.api('/me', {fields: $mvFacebookConfiguration.fields}, function(response) { //
                     // HERE: call the parsed function correctly (with scope AND params object)
                     $timeout(function() {
                       expressionHandler($scope, {status: 'success', response: response});
@@ -227,7 +232,7 @@
         
         function updateApplicationForLogin() {
           if(loginExpressionHandler) {
-            FB.api('/me', function(response) {
+            FB.api('/me', {fields: $mvFacebookConfiguration.fields}, function(response) {
               $timeout(function() {
                 loginExpressionHandler($scope, {status: 'success', response: response});
               }, 50);
