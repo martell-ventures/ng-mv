@@ -931,7 +931,7 @@
   // shareImage: @ - URL to share
   // shareName: @ - Name to share
   // shareDescription: @ - Description to share
-  module.directive('facebookPostButton', ['loadFacebookJavascript', '$timeout', '$parse', function( loadFacebookJavascript, $timeout, $parse ) {  
+  module.directive('facebookPostButton', ['loadFacebookJavascript', '$timeout', '$parse', '$mvFacebookConfiguration', function( loadFacebookJavascript, $timeout, $parse, $mvFacebookConfiguration ) {  
     return {
       restrict: 'A', // restrict by class name
       link: function( $scope, $element, $attrs ) {
@@ -1001,7 +1001,7 @@
                         expressionHandler($scope, {status: 'cancelled', response: response});
                       }, 50);
                     }
-                  }, {scope: 'email'});  
+                  }, {scope: $mvFacebookConfiguration.scope});
                 }
               });
             });
