@@ -2,8 +2,8 @@ To push a new version, you would use:
 
 Change the version in bower.json to the new version
 
-git tag -a v0.0.41 -m "Facebook login and profile picture improvements"
-git push origin v0.0.41
+git tag -a v0.0.42 -m "Added flagCheckbox for flags (bitfields)"
+git push origin v0.0.42
 
 Then:
 git push
