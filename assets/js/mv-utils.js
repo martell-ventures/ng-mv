@@ -13,6 +13,40 @@
 (function() {
 	var app= angular.module('mv.utils', ['mv.filters', 'mv.configuration', 'ui.bootstrap']);
 	
+	app.directive("flagCheckbox", ['$timeout', function($timeout) {
+		return {
+			restrict: 'A',
+			scope: {
+				flags: '=',
+				flag: '@flagCheckbox'
+			},
+			link: function($scope, $element, $attributes) {
+				var flag = parseInt($scope.flag);
+
+				$scope.$watch('flags', function(newValue) {
+					if(newValue !== undefined) {
+						if(newValue & flag) {
+							$element[0].checked = true;
+						} else {
+							$element[0].checked = false;
+						}
+					}
+				});
+
+				$element.on('click', function() {
+					// timeout is to put it back into angular scope
+					$timeout(function() {
+						if($element[0].checked) {
+							$scope.flags |= flag;
+						} else {
+							$scope.flags &= ~flag;
+						}
+					}, 1);
+				});
+			}
+		};
+	}]);
+
 	// use this to compare to and validate password and confirm passwrods.
 	app.directive("compareTo", function() {
 		return {
