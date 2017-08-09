@@ -2,8 +2,8 @@ To push a new version, you would use:
 
 Change the version in bower.json to the new version
 
-git tag -a v0.0.42 -m "Added flagCheckbox for flags (bitfields)"
-git push origin v0.0.42
+git tag -a v0.0.43 -m "Upgraded angular and made country loader use new request format"
+git push origin v0.0.43
 
 Then:
 git push
