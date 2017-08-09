@@ -18,10 +18,13 @@
   ],
   "devDependencies": {
     "bootstrap": "3.3.4",
-    "angular-bootstrap": ">0.14.0",
-    "angular-sanitize": "1.5.8"
+    "angular-bootstrap": ">2.0.0",
+    "angular-sanitize": "1.6.5"
   },
   "dependencies": {
-    "angular": "1.5.8"
+    "angular": "1.6.5"
+  },
+  "resolutions": {
+    "angular": "1.6.5"
   }
 }

@@ -11,24 +11,12 @@
 		var countryLoadDeferred = $q.defer();
 	
 		var getResult = $http.get($mvConfiguration.templateBasePath+'countries.json');
-		if(getResult.success !== undefined)
-		{
-			getResult.success(function(data) {
-				countryLoadDeferred.resolve(data);
-			});
-		
-			getResult.error(function(failureData) {
-				countryLoadDeferred.reject(failureData);
-			});
-		} else {
-			// modern versions of angular unify this with then.
-			getResult.then(function(data) {
-				countryLoadDeferred.resolve(data);
-			}, function(failureData) {
-				countryLoadDeferred.reject(failureData);
-			});
-		}
-		
+          getResult.then(function(responseData, status, headers, config) { 
+               countryLoadDeferred.resolve(responseData.data);
+          }, function(data, status, headers, config, statusText) {
+               countryLoadDeferred.reject(status);
+          });
+
 		return countryLoadDeferred.promise;
 	}]);
 
