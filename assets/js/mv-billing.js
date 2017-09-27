@@ -251,7 +251,7 @@
 				if (!ngModel) {
 					return; // do nothing if no ng-model
 				}
-		
+
 				if($element.prop('id')===undefined || $element.prop('id')==='')
 				{
 					// make it conform to safari autofill
@@ -300,8 +300,10 @@
 							ngModel.$setViewValue(digits);
 							ngModel.$render();
 							
-console.log("Selection Start: "+$element[0].selectionStart+" End: "+$element[0].selectionEnd+" Digits length: "+digits.length);
-							setSelectionRange(digits.length); //Necessary for Android Chrome mobile
+							console.log("Selection Start: "+$element[0].selectionStart+" End: "+$element[0].selectionEnd+" Digits length: "+digits.length);
+							if($element[0].selectionStart == $element[0].selectionEnd && $element[0].selectionStart < digits.length) {
+								setSelectionRange(digits.length); //Necessary for Android Chrome mobile
+							}
 						}
 						return digits;
 					}
