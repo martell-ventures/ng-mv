@@ -240,7 +240,7 @@
 	}]);
 
 	// so i don't think it's considered good form to eat non-numbers.  Intsead, we'll validate luhn.
-	module.directive('creditCardNumber', ['creditCards', function(creditCards) {
+	module.directive('creditCardNumber', ['creditCards', '$timeout', function(creditCards, $timeout) {
 		return {
 			restrict: 'A', // only activate on element attribute
 			require: '?ngModel', // get a hold of NgModelController
@@ -258,6 +258,34 @@
 					$element.prop('id', 'cardNumber');
 				}
 				
+				var timeout;
+				function setSelectionRange(selectionStart){
+					if (typeof selectionStart !== 'number') {
+						return;
+					}
+
+					// using $timeout:
+					// it should run after the DOM has been manipulated by Angular
+					// and after the browser renders (which may cause flicker in some cases)
+					$timeout.cancel(timeout);
+					timeout = $timeout(function(){
+						var selectionEnd = selectionStart + 1;
+						var input = $element[0];
+
+						if (input.setSelectionRange) {
+							input.focus();
+							input.setSelectionRange(selectionStart, selectionEnd);
+						} else if (input.createTextRange) {
+							var range = input.createTextRange();
+
+							range.collapse(true);
+							range.moveEnd('character', selectionEnd);
+							range.moveStart('character', selectionStart);
+							range.select();
+						}
+					});
+				}
+				
 				function digitsAndSpaceParser(inputValue) {
 					if (inputValue) {
 						var card= creditCards.fromNumber(inputValue);
@@ -268,10 +296,10 @@
 						} else {
 							digits = inputValue.replace(/[^0-9 ]/g, '');
 						}
-						
 						if (digits !== inputValue) {
 							ngModel.$setViewValue(digits);
 							ngModel.$render();
+							setSelectionRange(digits.length); //Necessary for Android Chrome mobile
 						}
 						return digits;
 					}
