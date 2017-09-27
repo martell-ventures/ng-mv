@@ -299,6 +299,8 @@
 						if (digits !== inputValue) {
 							ngModel.$setViewValue(digits);
 							ngModel.$render();
+							
+console.log("Selection Start: "+$element[0].selectionStart+" End: "+$element[0].selectionEnd+" Digits length: "+digits.length);
 							setSelectionRange(digits.length); //Necessary for Android Chrome mobile
 						}
 						return digits;
