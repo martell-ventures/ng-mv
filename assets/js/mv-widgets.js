@@ -13,17 +13,33 @@
         if(!ngModel) {
           return;
         }
-
-        var formGroupParent= $element.parents('.form-group:first');
-        if(formGroupParent)
-        {
-          formGroupParent.addClass('has-feedback');
+        
+        // This is jquery; don't use for angular only.
+        // var formGroupParent= $element.parents('.form-group:first');
+        // if(formGroupParent)
+        // {
+        //   formGroupParent.addClass('has-feedback');
+        // }
+        var updateValidityImmediately = $attrs['delayValidation'] !== undefined ? false : true;
+        
+        var formGroupParent;
+        var theParent = $element.parent();
+        while(theParent.length>0) {
+          if(theParent.hasClass('form-group')) {
+            theParent.addClass('has-feedback');
+            formGroupParent = theParent;
+            break;
+          } else {
+            theParent = theParent.parent();
+          }
         }
+
         var icon;
         // the icon only works on inputs that aren't in input-groups
-        if($element.prop('tagName')=='INPUT' && !$element.parent().hasClass('input-group'))
+        // if($element.prop('tagName')=='INPUT' && !$element.parent().hasClass('input-group'))
+        if($element.prop('tagName')=='INPUT' && (formGroupParent===undefined || !formGroupParent.hasClass('input-group')))
         {
-          icon= angular.element('<span class=" form-control-feedback glyphicon glyphicon-ok hidden"></span>');
+          icon = angular.element('<span class="form-control-feedback glyphicon glyphicon-ok hidden"></span>');
           $element.after(icon);
         }
 
@@ -32,20 +48,26 @@
           {
             if(valid)
             {
-              formGroupParent.removeClass('has-error').addClass('has-success');
+              if(formGroupParent !== undefined) {
+                formGroupParent.removeClass('has-error').addClass('has-success');
+              }
               if(icon !== undefined)
               {
                 icon.removeClass('hidden').removeClass('glyphicon-remove').addClass('glyphicon-ok');
               }
             } else{
-              formGroupParent.removeClass('has-success').addClass('has-error');
+              if(formGroupParent !== undefined) {
+                formGroupParent.removeClass('has-success').addClass('has-error');
+              }
               if(icon !== undefined)
               {
                 icon.removeClass('hidden').removeClass('glyphicon-ok').addClass('glyphicon-remove');
               }
             }
           } else {
-            formGroupParent.removeClass('has-success').removeClass('has-error');
+            if(formGroupParent !== undefined) {
+              formGroupParent.removeClass('has-success').removeClass('has-error');
+            }
             if(icon !== undefined)
             {
               icon.addClass('hidden');
@@ -56,12 +78,13 @@
         $scope.$watch(function() {
           return ngModel.$dirty+'-'+ngModel.$valid+'-'+ngModel.$touched;
         }, function() {
-          var showValidation= ngModel.$dirty || ngModel.$touched;// || ngModel.$valid;
+          var showValidation= (updateValidityImmediately && ngModel.$dirty) || ngModel.$touched;// || ngModel.$valid;
           updateValidity(showValidation, ngModel.$valid);
         });
       }
     };
   });
+
 
   module.directive('flashAlert', ['$timeout', function($timeout) {
     return { 
