@@ -12,7 +12,7 @@
       }
 
       var url= '//connect.facebook.net/'+language+'/';
-      url+= debug ? 'all/debug.js' : 'all.js';
+      url+= debug ? 'sdk/debug.js' : 'sdk.js';
       
       return url;
     }
@@ -85,6 +85,7 @@
           status      : true, // check login status
           cookie      : true, // enable cookies to allow the server to access the session
           xfbml       : true,  // parse XFBML
+          version     : 'v2.9', // Added based on documentation as of 10.10.17
           redirect_url: $mvFacebookConfiguration.redirectURL
         });
         deferred.resolve();
