@@ -2,8 +2,8 @@ To push a new version, you would use:
 
 Change the version in bower.json to the new version
 
-git tag -a v0.0.46 -m "Facebook: Added version and new URL per their documentation"
-git push origin v0.0.46
+git tag -a v0.0.48 -m "Internal: Fix mismatch on version in bower and in here."
+git push origin v0.0.48
 
 Then:
 git push
