@@ -1,0 +1,18 @@
+<div class="row">
+	<div class="col-xs-4">
+		<select class="form-control" ng-model="current.day" ng-disabled="disabled" ng-change="fieldChanged('day')" ng-options="day.id as day.label for day in current.days" required>
+			<option value="" disabled selected style="display: none;"> Day </option>
+		</select>
+	</div>
+	<div class="col-xs-4">
+		<select class="form-control" ng-model="current.month" ng-disabled="disabled" ng-change="fieldChanged('month')"
+		ng-options="month.id as month.label for month in current.months" required>
+			<option value="" disabled selected style="display: none;"> Month </option>
+		</select>
+	</div>
+	<div class="col-xs-4">
+		<select class="form-control" ng-model="current.year" ng-disabled="disabled" ng-change="fieldChanged('year')" ng-options="year.id as year.label for year in current.years" required>
+			<option value="" disabled selected style="display: none;"> Year </option>
+		</select>
+	</div>
+</div>

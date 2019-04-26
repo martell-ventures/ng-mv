@@ -1,8 +1,6 @@
-
-
 /* global jwplayer */
 (function() {
-  var module = angular.module('mv.widgets', []);
+  var module = angular.module('mv.widgets', [ 'mv.widgets.datepicker' ]);
 
   // use on a bootstrap form element; will show a red x or a green checkmark if valid.
   module.directive('showValidationIcon', function() {

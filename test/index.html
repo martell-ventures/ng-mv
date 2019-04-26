@@ -203,7 +203,7 @@
 		<div class="col-md-6">
 			<h3>Other Elements</h3>
 			<div class="well">
-				<form name="otherForm" novalidation ng-init="misc= { showJSON: false, flags: 5 };">
+				<form name="otherForm" novalidation ng-init="misc= { showJSON: false, flags: 5, date: '2017-02-03' };">
 					<div class="form-group">
 						<label>Commas Input</label>
 						<input class="form-control" type="text" thousands-comma ng-model="misc.thousandsComma"></input>
@@ -211,6 +211,11 @@
 					<div class="form-group">
 						<label>Elastic Input</label>
 						<input class="form-control" type="text" mv-elastic-input ng-model="misc.elasticInput"></input>
+					</div>
+					<div class="form-group">
+						<label>Select Date Entry</label>
+						<mv-select-datepicker ng-model="misc.date" first-year="1915">
+						</mv-select-datepicker>
 					</div>
 					<div class="form-group">
 						<label>Flag Checkboxes</label>
