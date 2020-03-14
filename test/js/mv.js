@@ -2329,23 +2329,72 @@
 			{
 				if (ngModel)
 				{
+					if($attrs.minDecimalDigits) {
+						// when they blur it, we will add the additional decimal digits to the string.
+						$element.blur(function() {
+							if(ngModel.$viewValue) {
+								var value = ngModel.$viewValue;
+								var digitsToAdd = 0;
+								var decimalIndex = value.indexOf('.');
+
+								if(decimalIndex===-1) {
+									// add a decimal .00
+									value += '.';
+									digitsToAdd = $attrs.minDecimalDigits;
+								} else {
+									digitsToAdd = $attrs.minDecimalDigits - (value.length - 1 - decimalIndex);
+								}
+
+								// maybe zero or less.
+								for(var ii= 0; ii<digitsToAdd; ii++) {
+									value += '0';
+								}
+
+								if(value !== ngModel.$viewValue) {
+									ngModel.$setViewValue(value);
+									ngModel.$render();
+								}
+							}
+						});
+					}
+
 					ngModel.$parsers.unshift(function (inputValue)
 					{
 						var decimalFound = false;
+						var digitsInARow  = 0;
+						var allowDecimal = ($attrs.allowDecimal && $attrs.allowDecimal=="true");
+
+						// if they are specifying maxDecimalDigits or minDecimalDigits, allowDecimal is true inherently...
+						if($attrs.maxDecimalDigits || $attrs.minDecimalDigits) {
+							allowDecimal = true;
+						}
+
 						var digits = inputValue.split('').filter(function (s,i)
 						{
 							var b = (!isNaN(s) && s != ' ');
-							if (!b && $attrs.allowDecimal && $attrs.allowDecimal == "true")
+
+							if(b) {
+								// number...
+								digitsInARow++;
+							}
+
+							if (!b && allowDecimal)
 							{
 								if (s == "." && decimalFound === false)
 								{
 									decimalFound = true;
+									digitsInARow = 0;
 									b = true;
 								}
 							}
 							if (!b && $attrs.allowNegative && $attrs.allowNegative == "true")
 							{
 								b = (s == '-' && parseInt(i) === 0);
+							}
+
+							// if we exceed the maximum decimal places, stop.
+							if(b && decimalFound && $attrs.maxDecimalDigits && digitsInARow > $attrs.maxDecimalDigits) {
+								b = false;
 							}
 
 							return b;
