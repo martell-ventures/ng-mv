@@ -17,6 +17,8 @@ grunt
 ## Troubleshooting
 
 ### How to tag versions
+Be sure package.json and bower.json have the correct (new) version.
+
 To list (to find current version):
 ```
 git tag -l
