@@ -486,7 +486,7 @@
 		return {
 			restrict: 'E',
 			scope: {},
-			template: '<input style="'+quasiInvisibleStyle+'" ng-model="afmonth" id="cardExpirationMonth" maxlength="2" ng-change="update()" type="text"><input style="'+quasiInvisibleStyle+'" id="cardExpirationYear" ng-model="afyear" maxlength="4" ng-change="update()" type="text">',
+			template: '<input style="'+quasiInvisibleStyle+'" ng-model="afmonth" id="cardExpirationMonth" maxlength="2" ng-change="update()" tabindex="-1" type="text"><input tabindex="-1" style="'+quasiInvisibleStyle+'" id="cardExpirationYear" ng-model="afyear" maxlength="4" ng-change="update()" type="text">',
 			link: function($scope, $element, $attr) {
 				$scope.update= function() {
 					$scope.$parent.$emit('autofill-date', { year: $scope.afyear || '', month: $scope.afmonth || ''});
