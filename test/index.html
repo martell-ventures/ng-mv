@@ -232,6 +232,70 @@
 				</form>
 			</div>
 		</div>
+
+		<div class="col-md-6">
+			<h3>Bank Elements</h3>
+			<div class="well">
+				<form name="bankForm" novalidation ng-init="bank= { showJSON: false, country: 'US', accountNumberOrIban: '', personalIdNumber: '', swiftOrBankId: ''  };">
+					<div class="form-group">
+						<label>Country</label>
+						<select class="form-control" ng-model="bank.country" ng-options="country.Code as country.Name for country in countries" >
+							<option>Please Select...</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label>
+							<kyc-personal-id-label country-code="bank.country" kyc-type="internal"></kyc-personal-id-label>
+						</label>
+						<input type="text" class="form-control" name="personalIdNumber" ng-model="bank.personalIdNumber" 
+							kyc-personal-id-for-country="bank.country" kyc-type="internal" show-validation-icon required>
+						<div class="help-block">
+							<kyc-personal-id-help-block-text country-code="bank.country" kyc-type="internal"></kyc-personal-id-help-block-text>
+						</div>
+					</div>
+					<div class="form-group" ng-show="countrySupportsIban(bank.country)">
+						<label>
+							International Bank Account Number (IBAN)
+						</label>
+<!--						<iban-account-number model="bank.accountNumberOrIban" country-code="bank.country" ></iban-account-number> -->
+						<input type="text" class="form-control" name="personalIdNumber" ng-model="bank.personalIdNumber" 
+							iban-number-for-country="bank.country" show-validation-icon required>
+						<p class="help-block">
+							<iban-help-block-text country-code="bank.country"></iban-help-block-text>
+						</p>
+					</div>
+
+					<div class="form-group">
+						<label>
+							<bank-routing-label country-code="bank.country"></bank-routing-label>
+						</label>
+						<input type="text" class="form-control" ng-model="bank.swiftOrBankId" 
+							bank-routing-number-for-country="bank.country" show-validation-icon required>
+						<p class="help-block">
+							<bank-routing-help-block-text country-code="bank.country"></bank-routing-help-block-text>
+						</p>
+					</div>
+	
+					<div class="form-group">
+						<label>
+							<bank-account-number-label country-code="bank.country"></bank-account-number-label>
+						</label>
+						<input type="text" class="form-control" 
+							ng-model="bank.accountNumberOrIban" 
+							bank-account-number-for-country="bank.country" 
+							show-validation-icon required>
+						<p class="help-block">
+							<bank-account-number-help-block-text country-code="bank.country"></bank-account-number-help-block-text>
+						</p>
+					</div>
+
+					<div class="checkbox">
+						<label><input type="checkbox" ng-model="bank.showJSON"></input> Show JSON</label>
+					</div>
+					<pre ng-show="bank.showJSON">{{ bank | json }}</pre>
+				</form>
+			</div>
+		</div>
 	</div>
 </body>
 
@@ -265,7 +329,7 @@
 </script>
 
 <script>
-	var app= angular.module('myApp', ['mv.configuration', 'mv.billing', 'mv.filters', 'mv.forms', 'mv.upload.button', 'mv.utils', 'mv.widgets', 'mv.facebook']);
+	var app= angular.module('myApp', ['mv.configuration', 'mv.billing', 'mv.filters', 'mv.forms', 'mv.upload.button', 'mv.utils', 'mv.widgets', 'mv.facebook', 'mv.banking']);
 
     // configure the martell ventures stuff.
     app.config(["$mvConfigurationProvider", function(mvConfig) {
@@ -278,7 +342,7 @@
 		mvFacebookConfig.setLoginRequiredScope('email,user_friends');
 	}]);
 	
-	app.controller("TestController", ['$scope', '$uibModal', '$sce', '$window', function($scope, $uibModal, $sce, $window) {
+	app.controller("TestController", ['$scope', '$uibModal', '$sce', '$window', 'mvCountryLoader', 'ibanProvider', function($scope, $uibModal, $sce, $window, mvCountryLoader, ibanProvider) {
 		$scope.facebook= {
 			hasData: false,
 			loginStatus: undefined,
@@ -300,6 +364,10 @@
 		
 		$scope.addressFieldChanged= function(field, newValue, oldValue) {
 			window.console.log("Field "+field+" changed from: "+oldValue+" to "+newValue);
+		};
+
+		$scope.countrySupportsIban= function(country) {
+			return ibanProvider.countrySupportsIBAN(country);
 		};
 		
 		$scope.facebookPostResult= function(status, response) {
@@ -391,6 +459,11 @@
 			return valid;
 		}
 		
+		mvCountryLoader.then(function(data) {
+			$scope.countries = data;
+		});
+
+
 		$scope.showAddressDialog= function(which) {
 			var modalInstance= $uibModal.open({
 				templateUrl: 'addressDialog.html',
