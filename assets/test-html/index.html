@@ -239,27 +239,26 @@
 				<form name="bankForm" novalidation ng-init="bank= { showJSON: false, country: 'US', accountNumberOrIban: '', personalIdNumber: '', swiftOrBankId: ''  };">
 					<div class="form-group">
 						<label>Country</label>
-						<select class="form-control" ng-model="bank.country">
+						<select class="form-control" ng-model="bank.country" ng-options="country.Code as country.Name for country in countries" >
 							<option>Please Select...</option>
-							<option value="US">United States</option>
-							<option value="GB">Great Britain</option>
 						</select>
 					</div>
 					<div class="form-group">
 						<label>
 							<kyc-personal-id-label country-code="bank.country" kyc-type="internal"></kyc-personal-id-label>
 						</label>
-						<input type="text" class="form-control" ng-model="bank.personalIdNumber" 
+						<input type="text" class="form-control" name="personalIdNumber" ng-model="bank.personalIdNumber" 
 							kyc-personal-id-for-country="bank.country" kyc-type="internal" show-validation-icon required>
 						<div class="help-block">
 							<kyc-personal-id-help-block-text country-code="bank.country" kyc-type="internal"></kyc-personal-id-help-block-text>
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group" ng-show="countrySupportsIban(bank.country)">
 						<label>
 							International Bank Account Number (IBAN)
 						</label>
-						<iban-account-number model="bank.accountNumberOrIban" country-code="bank.country" ></iban-account-number>
+						<input type="text" class="form-control" name="personalIdNumber" ng-model="bank.personalIdNumber" 
+							iban-number-for-country="bank.country" show-validation-icon required>
 						<p class="help-block">
 							<iban-help-block-text country-code="bank.country"></iban-help-block-text>
 						</p>
@@ -269,7 +268,8 @@
 						<label>
 							<bank-routing-label country-code="bank.country"></bank-routing-label>
 						</label>
-						<bank-routing-number country-code="bank.country" model="bank.swiftOrBankId"></bank-routing-number>
+						<input type="text" class="form-control" ng-model="bank.swiftOrBankId" 
+							bank-routing-number-for-country="bank.country" show-validation-icon required>
 						<p class="help-block">
 							<bank-routing-help-block-text country-code="bank.country"></bank-routing-help-block-text>
 						</p>
@@ -287,8 +287,6 @@
 							<bank-account-number-help-block-text country-code="bank.country"></bank-account-number-help-block-text>
 						</p>
 					</div>
-
-					<pre>{{ bankForm.$errors | json }}</pre>
 
 					<div class="checkbox">
 						<label><input type="checkbox" ng-model="bank.showJSON"></input> Show JSON</label>
@@ -343,7 +341,7 @@
 		mvFacebookConfig.setLoginRequiredScope('email,user_friends');
 	}]);
 	
-	app.controller("TestController", ['$scope', '$uibModal', '$sce', '$window', 'mvCountryLoader', function($scope, $uibModal, $sce, $window, mvCountryLoader) {
+	app.controller("TestController", ['$scope', '$uibModal', '$sce', '$window', 'mvCountryLoader', 'ibanProvider', function($scope, $uibModal, $sce, $window, mvCountryLoader, ibanProvider) {
 		$scope.facebook= {
 			hasData: false,
 			loginStatus: undefined,
@@ -365,6 +363,10 @@
 		
 		$scope.addressFieldChanged= function(field, newValue, oldValue) {
 			window.console.log("Field "+field+" changed from: "+oldValue+" to "+newValue);
+		};
+
+		$scope.countrySupportsIban= function(country) {
+			return ibanProvider.countrySupportsIBAN(country);
 		};
 		
 		$scope.facebookPostResult= function(status, response) {
@@ -457,7 +459,6 @@
 		}
 		
 		mvCountryLoader.then(function(data) {
-debugger;
 			$scope.countries = data;
 		});
 
