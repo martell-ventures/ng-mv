@@ -254,11 +254,10 @@
 						</div>
 					</div>
 					<div class="form-group" ng-show="countrySupportsIban(bank.country)">
-						<label>
+						<label for="accountNumberOrIban">
 							International Bank Account Number (IBAN)
 						</label>
-<!--						<iban-account-number model="bank.accountNumberOrIban" country-code="bank.country" ></iban-account-number> -->
-						<input type="text" class="form-control" name="personalIdNumber" ng-model="bank.personalIdNumber" 
+						<input type="text" class="form-control" name="accountNumberOrIban" ng-model="bank.accountNumberOrIban" 
 							iban-number-for-country="bank.country" show-validation-icon required>
 						<p class="help-block">
 							<iban-help-block-text country-code="bank.country"></iban-help-block-text>

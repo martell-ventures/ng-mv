@@ -90,17 +90,9 @@
 				break;
 			case 'CR': // Costa Rica
 				fields = {
-					pattern: "[A-Za-z]{2}\\d{19}", // 17n
-					description: "This is the IBAN account number.  It should be a two letter country prefix followed by 19 digits.",
-					maxLength: 21,
-					placeholder: "CR05015202001026284066"
-				};
-				break;
-			case 'CR': // Costa Rica
-				fields = {
-					pattern: "[A-Za-z]{2}\\d{19}", // 17n
-					description: "This is the IBAN account number.  It should be a two letter country prefix followed by 19 digits.",
-					maxLength: 21,
+					pattern: "[A-Za-z]{2}\\d{20}", // 17n
+					description: "This is the IBAN account number.  It should be a two letter country prefix followed by 20 digits.",
+					maxLength: 22,
 					placeholder: "CR05015202001026284066"
 				};
 				break;
