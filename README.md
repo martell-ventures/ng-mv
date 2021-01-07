@@ -27,7 +27,7 @@ git tag -l
 To tag (full tag):
 
 ```
-git tag -a v0.0.51 -m "my version 1.4"
+git tag -a v0.0.57 -m "Updated the countries.json file to match LG country list"
 ```
 
 And to push:
