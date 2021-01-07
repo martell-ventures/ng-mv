@@ -2,8 +2,8 @@ To push a new version, you would use:
 
 Change the version in bower.json to the new version
 
-git tag -a v0.0.53 -m "Moved banking and KYC validation into here."
-git push origin v0.0.53
+git tag -a v0.0.56 -m "Updated countries.json."
+git push origin v0.0.56
 
 Then:
 git push
