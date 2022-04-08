@@ -2537,36 +2537,6 @@
 			}
 			return selected;
 		}
-/*		
-		function loadCountriesFromServer() 
-		{
-			if(countryLoadDeferred===undefined)
-			{
-				countryLoadDeferred = $q.defer();
-				
-				var getResult = $http.get($mvConfiguration.templateBasePath+'countries.json');
-				if(getResult.success !== undefined)
-				{
-					getResult.success(function(data) {
-						countryLoadDeferred.resolve(data);
-					});
-					
-					getResult.error(function(failureData) {
-						countryLoadDeferred.reject(failureData);
-					});
-				} else {
-					// modern versions of angular unify this with then.
-					getResult.then(function(data) {
-						countryLoadDeferred.resolve(data);
-					}, function(failureData) {
-						countryLoadDeferred.reject(failureData);
-					});
-				}
-			}
-			
-			return countryLoadDeferred.promise;
-		}
-*/
 
 		return {
 			restrict: 'E',
@@ -2592,6 +2562,7 @@
 				useStreet2: "=?", //optional, set to true if you want to use street address line 2 field
 				fieldChanged: '&?', // optional, takes field, 
 				filterCountries: '&?', // optional, returns true if country is acceptable.
+				priorityCountries: '=?', // optional, if you want countries higher up in the list.
 				// fieldChanged: '&?' // optional fieldChanged
 				// filterCountries: method name- calls with country, returns true or false if the country should be used.
 			},
@@ -2723,26 +2694,55 @@
 					return req;
 				};
 
+				$scope.$watch('priorityCountries', function() {
+					loadCountries();
+				});
+
 				// load the countries
 				function loadCountries() 
 				{
 					mvCountryLoader.then(function(data) {
-//					loadCountriesFromServer().then(function(data) {
+						var countries = data;
+
+						debugger;
+						if($scope.priorityCountries && $scope.priorityCountries.length) {
+							var prioritized = [];
+							var skip_list = [];
+							angular.forEach($scope.priorityCountries, function(priority) {
+								var foundIndex = -1;
+								angular.forEach(countries, function(country, index) {
+									if(country.Code==priority) {
+										prioritized.push(country);
+										skip_list.push(index);
+									}
+								});
+							});
+
+							angular.forEach(countries, function(c, index) {
+								if(skip_list.indexOf(index)<0) {
+									prioritized.push(c);
+								}
+							});
+
+							countries = prioritized;
+
+						}
+
 						// allow us to filter countries
 						if($attrs.filterCountries)
 						{
 							var filtered= [];
-							angular.forEach(data, function(country) {
+							angular.forEach(countries, function(country) {
 								if($scope.filterCountries({ country: country }))
 								{
 									filtered.push(country);
 								}
 							});
-							$scope.countries= filtered;
-						} else {
-							$scope.countries= data;
+							countries = filtered;
 						}
-					
+
+						$scope.countries= countries;
+
 						var countryFound= false, hasUS= false;
 						angular.forEach($scope.countries, function(country) {
 							if(country.Code=='US')

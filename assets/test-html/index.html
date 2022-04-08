@@ -167,6 +167,9 @@
 							<div class="checkbox">
 								<label><input type="checkbox" ng-model="filterToOnlyStripeAvailableCountries" ng-change="changeCountryFilter()"></input> Filter Countries (Stripe Only)</label>
 							</div>
+							<div class="checkbox">
+								<label><input type="checkbox" ng-model="data.prioritizeCountryList" ng-change="changeCountryPriority()"></input> Prioritize Countries</label>
+							</div>
 						</div>
 					</div>
 					<div class="form-group">
@@ -190,6 +193,7 @@
 						use-street-2="address.useStreet2"
 						field-changed="addressFieldChanged(field, newValue, oldValue)"
 						filter-countries="filterCountry(country)"
+						priority-countries="data.priorityCountryList"
 						ng-disabled="disableAddress">
 					</mv-address>
 					<a class="btn btn-primary" ng-disabled="addressForm.$invalid">Submit</a>
@@ -312,7 +316,8 @@
 			zip="address.zip"
 			country="address.country"
 			required-fields="state.requiredFields"
-			use-street-2="address.useStreet2">
+			use-street-2="address.useStreet2"
+			priority-countries="state.priority_countries">
 		</mv-address>
 		<a class="btn btn-primary" ng-disabled="addressDialogForm.$invalid">Submit</a>
 		<div class="checkbox">
@@ -349,6 +354,10 @@
 			postResponse: undefined,
 			postStatus: undefined,
 			permissions: undefined
+		};
+		$scope.data = {
+			prioritizeCountryList: false,
+			priorityCountryList: []
 		};
 		
 		$scope.testFlashAlert= function() {
@@ -436,6 +445,14 @@
 		$scope.changeCountryFilter= function() {
 			$scope.$broadcast('mv-reload-countries');
 		};
+
+		$scope.changeCountryPriority = function() {
+			if($scope.data.prioritizeCountryList) {
+				$scope.data.priorityCountryList = ['US', 'CA', 'GB'];
+			} else {
+				$scope.data.priorityCountryList = [];
+			}
+		}
 		
 		$scope.filterCountry= function(country) {
 			var valid= true;
@@ -463,7 +480,7 @@
 		});
 
 
-		$scope.showAddressDialog= function(which) {
+		$scope.showAddressDialog= function(which, prioritize_countries) {
 			var modalInstance= $uibModal.open({
 				templateUrl: 'addressDialog.html',
 				controller: ['$scope', '$uibModalInstance', 'address', function($scope, $uibModalInstance, address) {
@@ -477,6 +494,11 @@
 							zip: true
 						}
 					};
+
+					if(prioritize_countries) {
+						$scope.state.priority_countries = ['US', 'CA', 'GB'];
+					}
+
 					$scope.address= address;
 					
 					$scope.cancel= function() {

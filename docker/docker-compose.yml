@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  client:
+    image: nginx
+    volumes:
+      - ../test:/usr/share/nginx/html
+    environment:
+      VIRTUAL_HOST: mv.local
+    networks:
+      - proxy_network
+
+networks:
+  proxy_network:
+    external: true
