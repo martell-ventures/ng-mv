@@ -216,7 +216,8 @@
               link: $attrs.shareLink, 
               picture: $attrs.shareImage, 
               name: $attrs.shareName, 
-              description: $attrs.shareDescription
+              description: $attrs.shareDescription,
+              display: 'popup'
             }, 
             function(postResponse) {
               $timeout(function() {
