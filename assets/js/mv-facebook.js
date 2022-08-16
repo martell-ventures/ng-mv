@@ -85,7 +85,7 @@
           status      : true, // check login status
           cookie      : true, // enable cookies to allow the server to access the session
           xfbml       : true,  // parse XFBML
-          version     : 'v2.9', // Added based on documentation as of 10.10.17
+          version     : 'v14.0', // ugraded to newest version as of 2022.08.05
           redirect_url: $mvFacebookConfiguration.redirectURL
         });
         deferred.resolve();
@@ -216,7 +216,8 @@
               link: $attrs.shareLink, 
               picture: $attrs.shareImage, 
               name: $attrs.shareName, 
-              description: $attrs.shareDescription
+              description: $attrs.shareDescription,
+              display: 'popup'
             }, 
             function(postResponse) {
               $timeout(function() {
