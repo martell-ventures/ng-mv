@@ -313,7 +313,6 @@
 					mvCountryLoader.then(function(data) {
 						var countries = data;
 
-						debugger;
 						if($scope.priorityCountries && $scope.priorityCountries.length) {
 							var prioritized = [];
 							var skip_list = [];

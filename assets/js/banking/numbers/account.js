@@ -46,6 +46,16 @@
 					digitsOnly: true
 				};
 				break;
+			case 'CA':
+				fields = {
+					pattern: '(\\d){7,12}',
+					label: "Account Number",
+					maxLength: 12,
+					placeholder: "1234567",
+					description: "This should be 7-12 digits.",
+					digitsOnly: true
+				};
+				break;
 			default:
 				fields = {
 					pattern: '(.){3,}',
