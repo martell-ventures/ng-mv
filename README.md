@@ -27,7 +27,7 @@ git tag -l
 To tag (full tag):
 
 ```
-git tag -a v0.0.64 -m "Minor tweaks to account labels for Canada"
+git tag -a v0.0.65 -m "Remove Curacao and Asian/Pacific Region from country list"
 ```
 
 And to push:
