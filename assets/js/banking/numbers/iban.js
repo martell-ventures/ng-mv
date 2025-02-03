@@ -88,6 +88,14 @@
 					placeholder: "BG80BNBG96611020345678"
 				};
 				break;
+			case 'CA': // Canada
+				fields = {
+					pattern: "\\d{7,12}", // 17n
+					description: "This is the IBAN account number. It should be consisted of 7-12 digits.",
+					maxLength: 12,
+					placeholder: "1234567"
+				};
+                break;
 			case 'CR': // Costa Rica
 				fields = {
 					pattern: "[A-Za-z]{2}\\d{20}", // 17n
