@@ -2222,29 +2222,47 @@
           function() {
             // success!
             $element.on('click', function() {
+				FB.getLoginStatus(function(statusResponse) {
+					if(statusResponse.status=='connected')
+					{
+						alert("already connected");
+					} else {
               FB.login(function(response) {
                 if (response.authResponse) {
-                  FB.api('/me', {fields: $mvFacebookConfiguration.fields}, function(response) { //
-                    // HERE: call the parsed function correctly (with scope AND params object)
-                    $timeout(function() {
-                      expressionHandler($scope, {status: 'success', response: response});
-                    }, 50);
-                  });
-                } 
-                else 
-                {
-                  $timeout(function() {
-                    expressionHandler($scope, {status: 'cancelled', response: response});
-                  }, 50);
+
+                var accessToken = null;
+                        if (response && response.authResponse && response.authResponse.accessToken) {
+                          accessToken = response.authResponse.accessToken;
+                } else {
+                  alert("Facebook Access token is missing!");
                 }
-              }, {scope: $mvFacebookConfiguration.scope, auth_type:'rerequest'});
-            });
-          }, 
-          function() {
-            // rejected
-            expressionHandler($scope, {status: 'loadingError', response: { }});
-          }
-        );
+
+
+                        FB.api('/me', {fields: $mvFacebookConfiguration.fields , access_token: accessToken}, function(userResponse) { //
+                          userResponse.accessToken = accessToken; // Attach token safely
+                          console.log("User Response 456 ----- **** ", userResponse);
+                          // HERE: call the parsed function correctly (with scope AND params object)
+                          $timeout(function() {
+                            expressionHandler($scope, {status: 'success', response: userResponse});
+                          }, 50);
+                        });
+                      } 
+                      else 
+                      {
+                        $timeout(function() {
+                          expressionHandler($scope, {status: 'cancelled', response: response});
+                        }, 50);
+                      }
+                    }, {scope: $mvFacebookConfiguration.scope, auth_type:'rerequest'});
+            } });
+                  });
+          
+                }, 
+                function() {
+                  // rejected
+                  expressionHandler($scope, {status: 'loadingError', response: { }});
+                }
+              );
       }
     };
   }]);
@@ -2298,9 +2316,10 @@
           );
         }
         
-        function updateApplicationForLogin() {
+        function updateApplicationForLogin(accessToken) {
           if(loginExpressionHandler) {
             FB.api('/me', {fields: $mvFacebookConfiguration.fields}, function(response) {
+			        response.accessToken = accessToken; // Attach token safely
               $timeout(function() {
                 loginExpressionHandler($scope, {status: 'success', response: response});
               }, 50);
@@ -2321,11 +2340,19 @@
                 } else {
                   FB.login(function(response) {
                     if(response.authResponse) {
+					  
+                      var accessToken = null;
+                              if (response && response.authResponse && response.authResponse.accessToken) {
+                              accessToken = response.authResponse.accessToken;
+                      } else {
+                        alert("Facebook Access token is missing!");
+                      }
+
                       // perform the post.
                       performPost();
                     
                       // if they weren't logged in before, they just logged in to post; let the app know about it.
-                      updateApplicationForLogin();
+                      updateApplicationForLogin(accessToken);
                     } else {
                       $timeout(function() {
                         expressionHandler($scope, {status: 'cancelled', response: response});
