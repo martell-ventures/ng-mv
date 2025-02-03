@@ -27,7 +27,7 @@ git tag -l
 To tag (full tag):
 
 ```
-git tag -a v0.0.65 -m "Remove Curacao and Asian/Pacific Region from country list"
+git tag -a v0.0.66 -m "Send token from FB when logging in"
 ```
 
 And to push:
