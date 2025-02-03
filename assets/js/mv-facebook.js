@@ -156,47 +156,47 @@
           function() {
             // success!
             $element.on('click', function() {
-				FB.getLoginStatus(function(statusResponse) {
-					if(statusResponse.status=='connected')
-					{
-						alert("already connected");
-					} else {
-              FB.login(function(response) {
-                if (response.authResponse) {
+            FB.getLoginStatus(function(statusResponse) {
+              if(statusResponse.status=='connected')
+              {
+                alert("already connected, please clear the cache");
+              } else {
+                  FB.login(function(response) {
+                    if (response.authResponse) {
 
-                var accessToken = null;
-                        if (response && response.authResponse && response.authResponse.accessToken) {
-                          accessToken = response.authResponse.accessToken;
-                } else {
-                  alert("Facebook Access token is missing!");
-                }
+              var accessToken = null;
+                      if (response && response.authResponse && response.authResponse.accessToken) {
+                        accessToken = response.authResponse.accessToken;
+              } else {
+                alert("Facebook Access token is missing!");
+              }
 
 
-                        FB.api('/me', {fields: $mvFacebookConfiguration.fields , access_token: accessToken}, function(userResponse) { //
-                          userResponse.accessToken = accessToken; // Attach token safely
-                          console.log("User Response 456 ----- **** ", userResponse);
-                          // HERE: call the parsed function correctly (with scope AND params object)
-                          $timeout(function() {
-                            expressionHandler($scope, {status: 'success', response: userResponse});
-                          }, 50);
-                        });
-                      } 
-                      else 
-                      {
+                      FB.api('/me', {fields: $mvFacebookConfiguration.fields , access_token: accessToken}, function(userResponse) { //
+              userResponse.accessToken = accessToken; // Attach token safely
+              
+                        // HERE: call the parsed function correctly (with scope AND params object)
                         $timeout(function() {
-                          expressionHandler($scope, {status: 'cancelled', response: response});
+                          expressionHandler($scope, {status: 'success', response: userResponse});
                         }, 50);
-                      }
-                    }, {scope: $mvFacebookConfiguration.scope, auth_type:'rerequest'});
-            } });
-                  });
-          
-                }, 
-                function() {
-                  // rejected
-                  expressionHandler($scope, {status: 'loadingError', response: { }});
-                }
-              );
+                      });
+                    } 
+                    else 
+                    {
+                      $timeout(function() {
+                        expressionHandler($scope, {status: 'cancelled', response: response});
+                      }, 50);
+                    }
+                  }, {scope: $mvFacebookConfiguration.scope, auth_type:'rerequest'});
+          } });
+                });
+        
+              }, 
+              function() {
+                // rejected
+                expressionHandler($scope, {status: 'loadingError', response: { }});
+              }
+            );
       }
     };
   }]);
@@ -251,56 +251,56 @@
         }
         
         function updateApplicationForLogin(accessToken) {
-          if(loginExpressionHandler) {
+        if(loginExpressionHandler) {
             FB.api('/me', {fields: $mvFacebookConfiguration.fields}, function(response) {
-			        response.accessToken = accessToken; // Attach token safely
-              $timeout(function() {
+            response.accessToken = accessToken; // Attach token safely
+            $timeout(function() {
                 loginExpressionHandler($scope, {status: 'success', response: response});
-              }, 50);
+            }, 50);
             });
-          }
+        }
         }
         
         // load the facebook javascript...
         loadFacebookJavascript.then(
-          function() {
+            function() {
             // success!
             $element.on('click', function() {
-              // this is cached; so it's okay to do this in the click handler
-              FB.getLoginStatus(function(statusResponse) {
+                // this is cached; so it's okay to do this in the click handler
+                FB.getLoginStatus(function(statusResponse) {
                 if(statusResponse.status=='connected')
                 {
-                  performPost();
+                    performPost();
                 } else {
-                  FB.login(function(response) {
+                    FB.login(function(response) {
                     if(response.authResponse) {
-					  
-                      var accessToken = null;
-                              if (response && response.authResponse && response.authResponse.accessToken) {
-                              accessToken = response.authResponse.accessToken;
-                      } else {
+                        
+                        var accessToken = null;
+                        if (response && response.authResponse && response.authResponse.accessToken) {
+                        accessToken = response.authResponse.accessToken;
+                        } else {
                         alert("Facebook Access token is missing!");
-                      }
+                        }
 
-                      // perform the post.
-                      performPost();
+                        // perform the post.
+                        performPost();
                     
-                      // if they weren't logged in before, they just logged in to post; let the app know about it.
-                      updateApplicationForLogin(accessToken);
+                        // if they weren't logged in before, they just logged in to post; let the app know about it.
+                        updateApplicationForLogin(accessToken);
                     } else {
-                      $timeout(function() {
+                        $timeout(function() {
                         expressionHandler($scope, {status: 'cancelled', response: response});
-                      }, 50);
+                        }, 50);
                     }
-                  }, {scope: $mvFacebookConfiguration.scope});
+                    }, {scope: $mvFacebookConfiguration.scope});
                 }
-              });
+                });
             });
-          }, 
-          function() {
+            }, 
+            function() {
             // rejected
             expressionHandler($scope, {status: 'loadingError', response: { }});
-          }
+            }
         );
       }
     };
